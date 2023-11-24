@@ -21,14 +21,18 @@ def main() -> None:
     clock = gameInstance.clock
     b2h = gameInstance.b2Helper
     b2pyh = gameInstance.b2PyHelper
-
+    print(player)
     for i in range(50):
         dungeon.addRoom(500, 500)
 
-    for room in dungeon.rooms:
-        for i in range(5):
-            Enemy(tuple((room.x, room.y)), tuple((room.w, room.h)), random.randrange(2, 17),
-                  10, b2pyh, b2h, world)
+    # for room in dungeon.rooms:
+    #     for i in range(5):
+    #         Enemy(tuple((room.x, room.y)), tuple((room.w, room.h)), random.randrange(2, 17),
+    #               10, b2pyh, b2h, world)
+
+    room = dungeon.rooms[0]
+
+
 
     crosshair = setUpCrosshair(b2pyh, gameInstance, world)
 
@@ -54,6 +58,8 @@ def main() -> None:
 
         pygame.display.flip()
 
+
+        enemy.update(player.b2Object)
         checkBullets(gameInstance)
         bulletDecay(gameInstance, world)
         killEnemy(gameInstance, world)

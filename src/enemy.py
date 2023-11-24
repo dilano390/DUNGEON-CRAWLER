@@ -1,5 +1,5 @@
 import random
-
+import math
 import Box2D
 
 from b2Helper import B2Helper
@@ -17,15 +17,15 @@ class Enemy:
         self.b2PyHelper = b2PyHelper
         self.b2Helper = b2Helper
         self.world = world
-
+        self.direction = (0, 0)
         self.w = 20
         self.h = 20
         self.x = self.constrain(self.getRandomNumber(cageDim[0]), 0 + self.w + 5, self.cageDim[0] - self.w - 5) + \
                  cagePos[0]
         self.y = self.constrain(self.getRandomNumber(cageDim[1]), 0 + self.h + 5, self.cageDim[1] - self.h - 5) + \
                  cagePos[1]
-
-        self.b2Object = self.b2Object = self.world.CreateDynamicBody(
+        self.pos = tuple((self.x, self.y))
+        self.b2Object = self.world.CreateDynamicBody(
             position=(self.b2PyHelper.convertCordsToB2Vec2(self.x, self.y)),
             shapes=(self.b2Helper.createPolygon(0, 0, self.w, self.h)))
         self.b2Object.mass = 200
@@ -39,9 +39,31 @@ class Enemy:
         red = self.constrain(red, 155, 255)
         self.b2Object.userData['color'] = tuple((red, color[1], color[2]))
         self.lives -= damage
-        print(self.lives)
         if self.lives <= 0:
             gameInstance.enemiesUpForDeletion.append(self)
+
+    def update(self, target):
+        # Get positions of both bodies
+        enemyPos = self.b2Object.position
+        targetPos = target.position
+
+        direction = targetPos - enemyPos  # This gives a vector pointing from A to B
+
+        # Normalize the direction vector
+        direction.Normalize()
+
+        # Define a speed or velocity at which bodyA will move
+        speed = self.speed  # Adjust as needed
+
+        # Calculate the desired velocity vector by multiplying the direction by speed
+        desired_velocity = direction * speed
+
+        # Calculate the impulse needed to achieve the desired velocity (assuming bodyA has a mass)
+        current_velocity = self.b2Object.linearVelocity
+        impulse = self.b2Object.mass * (desired_velocity - current_velocity)
+
+        # Apply the impulse to move bodyA towards bodyB
+        self.b2Object.ApplyLinearImpulse(impulse, enemyPos, True)
 
     @staticmethod
     def constrain(val, min_val, max_val):
