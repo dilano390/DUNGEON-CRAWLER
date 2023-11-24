@@ -14,6 +14,7 @@ def setUpCrosshair(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, world: 
         shapes=(Box2D.b2CircleShape(radius=0.3)))
     crosshair.fixtures[0].filterData.categoryBits = gameInstance.NON_COLLIDING_CATEGORY
     crosshair.fixtures[0].filterData.maskBits = gameInstance.NON_COLLIDING_MASK
+    crosshair.userData = {'crosshair': True}
     return crosshair
 
 
@@ -36,23 +37,29 @@ def determineCameraOffset(gameInstance: DungeonGameInstance, player: Player, pre
     return prevX, prevY
 
 
+def checkBullets(gameInstance: DungeonGameInstance):
+    for bullet in gameInstance.bullets:
+        if len(bullet.body.contacts):
+            for contact in bullet.body.contacts:
+                contactUserData = contact.other.userData
+                if contactUserData is not None:
+                    if 'player' in contactUserData:
+                        return
+            gameInstance.bulletsUpForDeletion.append(bullet)
+            bullet.impactTime = pygame.time.get_ticks()
+            gameInstance.bullets.remove(bullet)
+
+
 def bulletDecay(gameInstance: DungeonGameInstance, world: Box2D.b2World) -> None:
     for bullet in gameInstance.bulletsUpForDeletion:
-        world.DestroyBody(bullet)
-        gameInstance.bulletsUpForDeletion.remove(bullet)
+        if pygame.time.get_ticks() - bullet.impactTime > gameInstance.BULLET_LIFETIME_AFTER_COLL:
+            world.DestroyBody(bullet.body)
+            gameInstance.bulletsUpForDeletion.remove(bullet)
 
 
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
     for body in world.bodies:
-        # if body.userData is not None:
-        #     if body.userData["shatter_after_impact"] and not body.userData["impacted"] and len(body.contacts) > 0:
-        #         body.userData["impact_time"] = pygame.time.get_ticks()
-        #         body.userData["impacted"] = True
-        #     if body.userData["impacted"]:
-        #         if pygame.time.get_ticks() - body.userData["impact_time"] > gameInstance.BULLET_LIFETIME:
-        #             gameInstance.bulletsUpForDeletion.append(body)
-
         for fixture in body.fixtures:
             shape = fixture.shape
             if isinstance(shape, Box2D.b2CircleShape):

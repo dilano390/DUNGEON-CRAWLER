@@ -1,7 +1,7 @@
 import pygame
 
 from dungeonGameInstance import DungeonGameInstance
-from gameFlow import setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame
+from gameFlow import setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets
 
 pygame.display.set_caption("Dilano Emanuel Jermaine Doelwijt G20230417")
 
@@ -46,6 +46,7 @@ def main() -> None:
 
         pygame.display.flip()
 
+        checkBullets(gameInstance)
         bulletDecay(gameInstance, world)
 
         world.Step(gameInstance.TIME_STEP, 10, 10)

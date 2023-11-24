@@ -15,7 +15,8 @@ class DungeonGameInstance:
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 800
         self.INPUT_SENSITIVITY = 10
-        self.BULLET_LIFETIME = 200
+        self.BULLET_LIFETIME = 3000
+        self.BULLET_LIFETIME_AFTER_COLL = 500
         self.NON_COLLIDING_CATEGORY = 0
         self.NON_COLLIDING_MASK = 0
         self.bulletsUpForDeletion = []
@@ -29,5 +30,7 @@ class DungeonGameInstance:
         self.b2Helper = B2Helper(self.world, self.PPM)
         self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, self.world, 50, 50, self.b2Helper,
                                        self.b2PyHelper)
+
+        self.bullets = []
         self.player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2PyHelper, self.b2Helper,
-                             self.cameraOffset, self.world, self.INPUT_SENSITIVITY)
+                             self.cameraOffset, self.world, self.INPUT_SENSITIVITY, self.bullets)
