@@ -1,7 +1,10 @@
+import random
+
 import pygame
 
 from dungeonGameInstance import DungeonGameInstance
-from gameFlow import setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets
+from enemy import Enemy
+from gameFlow import setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets, killEnemy
 
 pygame.display.set_caption("Dilano Emanuel Jermaine Doelwijt G20230417")
 
@@ -21,6 +24,11 @@ def main() -> None:
 
     for i in range(50):
         dungeon.addRoom(500, 500)
+
+    for room in dungeon.rooms:
+        for i in range(5):
+            Enemy(tuple((room.x, room.y)), tuple((room.w, room.h)), random.randrange(2, 17),
+                  10, b2pyh, b2h, world)
 
     crosshair = setUpCrosshair(b2pyh, gameInstance, world)
 
@@ -48,6 +56,7 @@ def main() -> None:
 
         checkBullets(gameInstance)
         bulletDecay(gameInstance, world)
+        killEnemy(gameInstance, world)
 
         world.Step(gameInstance.TIME_STEP, 10, 10)
         clock.tick(gameInstance.FPS)

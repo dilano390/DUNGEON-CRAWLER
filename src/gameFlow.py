@@ -2,7 +2,7 @@ from typing import Tuple
 
 import Box2D
 import pygame
-
+from enemy import Enemy
 from b2PyHelper import B2PyHelper
 from dungeonGameInstance import DungeonGameInstance
 from player import Player
@@ -45,6 +45,9 @@ def checkBullets(gameInstance: DungeonGameInstance):
                 if contactUserData is not None:
                     if 'player' in contactUserData:
                         return
+                    if 'enemy' in contactUserData:
+                        enemy : Enemy = contactUserData['enemy']
+                        enemy.takeDamage(2,gameInstance)
             gameInstance.bulletsUpForDeletion.append(bullet)
             bullet.impactTime = pygame.time.get_ticks()
             gameInstance.bullets.remove(bullet)
@@ -56,6 +59,10 @@ def bulletDecay(gameInstance: DungeonGameInstance, world: Box2D.b2World) -> None
             world.DestroyBody(bullet.body)
             gameInstance.bulletsUpForDeletion.remove(bullet)
 
+def killEnemy(gameInstance : DungeonGameInstance, world: Box2D.b2World) -> None:
+    for enemy in gameInstance.enemiesUpForDeletion:
+        world.DestroyBody(enemy.b2Object)
+        gameInstance.enemiesUpForDeletion.remove(enemy)
 
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
@@ -74,5 +81,9 @@ def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygam
                 if isinstance(shape, Box2D.b2EdgeShape):
                     pygame.draw.line(screen, (0, 155, 255), vertices[0], vertices[1], 3)
                 elif isinstance(shape, Box2D.b2PolygonShape):
+                    color = (255,0,0)
+                    if body.userData is not None:
+                        if 'color' in body.userData:
+                            color = body.userData['color']
 
-                    pygame.draw.polygon(screen, (255, 0, 0), vertices)
+                    pygame.draw.polygon(screen, color, vertices)

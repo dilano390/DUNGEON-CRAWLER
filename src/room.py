@@ -5,7 +5,6 @@ import Box2D
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from dungeonHelper import Side
-from enemy import Enemy
 
 
 class Room:
@@ -19,7 +18,7 @@ class Room:
         self.side = side
         self.b2h = b2h
         self.b2pyh = b2pyh
-        self.enemies: List[Enemy] = []
+        self.enemies = []
 
         left = self.b2h.createEdge(0, h, 0, 0)
         top = self.b2h.createEdge(w, 0, 0, self.h)

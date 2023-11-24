@@ -1,6 +1,5 @@
 import Box2D
 from pygame import time
-
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 

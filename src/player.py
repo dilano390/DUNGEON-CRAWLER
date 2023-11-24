@@ -53,4 +53,3 @@ class Player:
             Bullet(self.b2PyHelper.convertTupleToB2Vec2(playerPos), self.b2PyHelper.convertTupleToB2Vec2(bullet_vector),
                    100, self.world, self.b2PyHelper, self.b2Helper))
 
-        # bullet.userData = {'shatter_after_impact': True, 'impacted': False, 'impactTime': 0}

@@ -20,6 +20,7 @@ class DungeonGameInstance:
         self.NON_COLLIDING_CATEGORY = 0
         self.NON_COLLIDING_MASK = 0
         self.bulletsUpForDeletion = []
+        self.enemiesUpForDeletion = []
         self.gameActive = True
 
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
