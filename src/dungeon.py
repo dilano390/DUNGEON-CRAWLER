@@ -1,16 +1,15 @@
 import random
-
 import Box2D
-
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from dungeonHelper import Side, flipSide, checkCollision
+# from player import Player
 from room import Room
 
-
 class Dungeon:
-    def __init__(self, x: int, y: int, world: Box2D.b2World, corridorLen: int, corridorWidth: int, b2h: B2Helper,
-                 b2pyh: B2PyHelper) -> None:
+    def __init__(self, x: int, y: int, roomWH: int, roomCount: int, world: Box2D.b2World,
+                 corridorLen: int, corridorWidth: int, b2h: B2Helper,
+                 b2pyh: B2PyHelper, enemySpawner) -> None:
         self.world = world
         self.rooms = []
         self.x = x
@@ -19,6 +18,22 @@ class Dungeon:
         self.corridorWidth = corridorWidth
         self.b2h = b2h
         self.b2pyh = b2pyh
+        self.enemySpawnFunc = enemySpawner
+        for i in range(roomCount):
+            self.addRoom(roomWH, roomWH)
+        self.visited = [self.rooms[0]]
+        self.currentRoom = self.rooms[0]
+        self.enemySpawnFunc(self.rooms[0], self.b2pyh, self.b2h, self.world)
+        self.roomChanged = False
+
+    def trackAndChangeRoom(self, playerPosition):
+        for room in self.rooms:
+            if checkCollision(playerPosition[0], playerPosition[1], 10, 10, room.x, room.y, room.w, room.h):
+                if not self.currentRoom == room and room not in self.visited:
+                    self.visited.append(room)
+                    self.enemySpawnFunc(room, self.b2pyh, self.b2h, self.world)
+                self.currentRoom = room
+                return
 
     def addCorridor(self, side: Side, roomW: int, roomH: int) -> None:
         x = self.x

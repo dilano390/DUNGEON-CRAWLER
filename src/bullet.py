@@ -18,3 +18,4 @@ class Bullet:
         self.body.density = density
         self.creationTime = time.get_ticks()
         self.impactTime = 0
+        self.body.mass = 30

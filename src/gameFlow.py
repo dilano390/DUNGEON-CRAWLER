@@ -47,7 +47,7 @@ def checkBullets(gameInstance: DungeonGameInstance):
                         return
                     if 'enemy' in contactUserData:
                         enemy : Enemy = contactUserData['enemy']
-                        enemy.takeDamage(2,gameInstance)
+                        enemy.takeDamage(2)
             gameInstance.bulletsUpForDeletion.append(bullet)
             bullet.impactTime = pygame.time.get_ticks()
             gameInstance.bullets.remove(bullet)
@@ -59,10 +59,10 @@ def bulletDecay(gameInstance: DungeonGameInstance, world: Box2D.b2World) -> None
             world.DestroyBody(bullet.body)
             gameInstance.bulletsUpForDeletion.remove(bullet)
 
-def killEnemy(gameInstance : DungeonGameInstance, world: Box2D.b2World) -> None:
-    for enemy in gameInstance.enemiesUpForDeletion:
-        world.DestroyBody(enemy.b2Object)
-        gameInstance.enemiesUpForDeletion.remove(enemy)
+def killEnemies(room):
+    for enemy in room.enemies:
+        if enemy.lives <= 0:
+            room.enemies.remove(enemy)
 
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:

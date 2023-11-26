@@ -44,6 +44,7 @@ class Player:
         mousePos = tuple((mousePos[0] - self.cameraOffset[0], mousePos[1] + self.cameraOffset[1]))
         distance = [mousePos[0] - playerPos[0], mousePos[1] - playerPos[1]]
         norm = math.sqrt(distance[0] ** 2 + distance[1] ** 2)
+        if norm == 0: norm += 0.2
         direction = [distance[0] / norm, distance[1] / norm]
         offset = 8
         playerPos = tuple((playerPos[0] + direction[0] * offset, playerPos[1] + direction[1] * offset))
@@ -51,5 +52,5 @@ class Player:
         bullet_vector = [direction[0] * math.sqrt(2) * speed, direction[1] * math.sqrt(2) * speed]
         self.bullets.append(
             Bullet(self.b2PyHelper.convertTupleToB2Vec2(playerPos), self.b2PyHelper.convertTupleToB2Vec2(bullet_vector),
-                   100, self.world, self.b2PyHelper, self.b2Helper))
+                   50, self.world, self.b2PyHelper, self.b2Helper))
 

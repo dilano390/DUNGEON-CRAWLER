@@ -1,5 +1,7 @@
 from enum import Enum
+from typing import List
 
+from enemy import Enemy
 
 class Axis(Enum):
     HORIZONTAL = 0
@@ -18,6 +20,10 @@ def flipSide(side: Side) -> Side:
     if side == Side.RIGHT: return Side.LEFT
     if side == Side.TOP: return Side.BOTTOM
     if side == Side.BOTTOM: return Side.TOP
+
+def updateAllEnemiesInList(theList : List[Enemy],target):
+    for e in theList:
+        e.update(target)
 
 
 def checkCollision(r1x: int, r1y: int, r1w: int, r1h: int, r2x: int, r2y: int, r2w: int, r2h: int) -> bool:

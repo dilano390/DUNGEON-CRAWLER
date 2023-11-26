@@ -6,7 +6,6 @@ from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from dungeonHelper import Side
 
-
 class Room:
     def __init__(self, x: int, y: int, w: int, h: int, corridorSides: List[Side], corridorWidth: int, side: Side,
                  world: Box2D.b2World, b2h: B2Helper, b2pyh: B2PyHelper):

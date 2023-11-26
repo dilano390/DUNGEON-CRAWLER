@@ -4,8 +4,8 @@ import pygame
 
 from dungeonGameInstance import DungeonGameInstance
 from enemy import Enemy
-from gameFlow import setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets, killEnemy
-
+from gameFlow import setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets, killEnemies
+from dungeonHelper import updateAllEnemiesInList
 pygame.display.set_caption("Dilano Emanuel Jermaine Doelwijt G20230417")
 
 
@@ -21,18 +21,6 @@ def main() -> None:
     clock = gameInstance.clock
     b2h = gameInstance.b2Helper
     b2pyh = gameInstance.b2PyHelper
-    print(player)
-    for i in range(50):
-        dungeon.addRoom(500, 500)
-
-    # for room in dungeon.rooms:
-    #     for i in range(5):
-    #         Enemy(tuple((room.x, room.y)), tuple((room.w, room.h)), random.randrange(2, 17),
-    #               10, b2pyh, b2h, world)
-
-    room = dungeon.rooms[0]
-
-
 
     crosshair = setUpCrosshair(b2pyh, gameInstance, world)
 
@@ -44,6 +32,7 @@ def main() -> None:
     prevY = player.b2Object.position[1]
 
     while gameInstance.gameActive:
+        currentRoom = dungeon.currentRoom
         handleEvents(gameInstance)
 
         crosshair.position = b2pyh.convertTupleToB2Vec2(b2pyh.flipYaxis(pygame.mouse.get_pos()))
@@ -56,13 +45,15 @@ def main() -> None:
 
         drawGame(b2pyh, gameInstance, screen, world)
 
+        killEnemies(currentRoom)
+        updateAllEnemiesInList(currentRoom.enemies,player.b2Object)
+
         pygame.display.flip()
 
+        dungeon.trackAndChangeRoom(b2pyh.convertB2Vec2toTuple(player.b2Object.position))
 
-        enemy.update(player.b2Object)
         checkBullets(gameInstance)
         bulletDecay(gameInstance, world)
-        killEnemy(gameInstance, world)
 
         world.Step(gameInstance.TIME_STEP, 10, 10)
         clock.tick(gameInstance.FPS)

@@ -5,6 +5,7 @@ import dungeon
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from player import Player
+from enemySpawner import spawnEnemy
 
 
 class DungeonGameInstance:
@@ -29,9 +30,9 @@ class DungeonGameInstance:
         self.cameraOffset = [0, 0]
         self.b2PyHelper = B2PyHelper(self.PPM, self.cameraOffset, self.INPUT_SENSITIVITY, self.WINDOW_HEIGHT)
         self.b2Helper = B2Helper(self.world, self.PPM)
-        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, self.world, 50, 50, self.b2Helper,
-                                       self.b2PyHelper)
-
         self.bullets = []
         self.player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2PyHelper, self.b2Helper,
                              self.cameraOffset, self.world, self.INPUT_SENSITIVITY, self.bullets)
+        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2,500,30,self.world, 50, 50, self.b2Helper,
+                                       self.b2PyHelper, spawnEnemy)
+
