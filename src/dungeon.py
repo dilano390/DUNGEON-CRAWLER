@@ -23,16 +23,27 @@ class Dungeon:
             self.addRoom(roomWH, roomWH)
         self.visited = [self.rooms[0]]
         self.currentRoom = self.rooms[0]
+        self.currentRoom.closeRoom()
         self.enemySpawnFunc(self.rooms[0], self.b2pyh, self.b2h, self.world)
         self.roomChanged = False
+        self.roomCount = len(self.rooms)
+
 
     def trackAndChangeRoom(self, playerPosition):
+
         for room in self.rooms:
-            if checkCollision(playerPosition[0], playerPosition[1], 10, 10, room.x, room.y, room.w, room.h):
+            if checkCollision(playerPosition[0], playerPosition[1], 10, 10, room.x + 10, room.y + 10, room.w - 20, room.h - 20):
                 if not self.currentRoom == room and room not in self.visited:
                     self.visited.append(room)
                     self.enemySpawnFunc(room, self.b2pyh, self.b2h, self.world)
+                    room.closeRoom()
+
+
+
+
                 self.currentRoom = room
+                if not len(self.currentRoom.enemies) and self.currentRoom.closed:
+                    self.currentRoom.openRoom()
                 return
 
     def addCorridor(self, side: Side, roomW: int, roomH: int) -> None:

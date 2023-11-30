@@ -18,13 +18,19 @@ class Room:
         self.b2h = b2h
         self.b2pyh = b2pyh
         self.enemies = []
-
+        self.doorBlocker = None
+        self.doorBlockers = []
+        self.doorBlockers.append(self.b2h.createEdge(0,self.h,0,0))
+        self.doorBlockers.append(self.b2h.createEdge(0,self.h,self.w,0))
+        self.doorBlockers.append(self.b2h.createEdge(self.w,0,0,self.h))
+        self.doorBlockers.append(self.b2h.createEdge(self.w,0,0,0))
         left = self.b2h.createEdge(0, h, 0, 0)
-        top = self.b2h.createEdge(w, 0, 0, self.h)
+        top = self.b2h.createEdge(w, 0, 0, h)
         bottom = self.b2h.createEdge(w, 0, 0, 0)
-        right = self.b2h.createEdge(0, h, self.w, 0)
+        right = self.b2h.createEdge(0, h, w, 0)
         self.corridors = corridorSides
-
+        self.closed = False
+        # comp4300
         # 0  = left
         # 1 = right
         # 2 =  top
@@ -35,6 +41,17 @@ class Room:
             corridor = self.corridors[i]
             if corridor:
                 self.createWall(Side(i), corridorWidth, h, w)
+
+    def closeRoom(self):
+        self.doorBlocker = self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x,self.y),shapes=self.doorBlockers)
+        self.closed = True
+        return
+    def openRoom(self):
+        self.world.DestroyBody(self.doorBlocker)
+        self.closed = False
+        return
+
+
 
     def createWall(self, corridorSide: Side, corridorWidth: int, h: int, w: int) -> None:
         if corridorSide == Side.TOP:

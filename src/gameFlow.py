@@ -14,7 +14,6 @@ def setUpCrosshair(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, world: 
         shapes=(Box2D.b2CircleShape(radius=0.3)))
     crosshair.fixtures[0].filterData.categoryBits = gameInstance.NON_COLLIDING_CATEGORY
     crosshair.fixtures[0].filterData.maskBits = gameInstance.NON_COLLIDING_MASK
-    crosshair.userData = {'crosshair': True}
     return crosshair
 
 
@@ -43,8 +42,6 @@ def checkBullets(gameInstance: DungeonGameInstance):
             for contact in bullet.body.contacts:
                 contactUserData = contact.other.userData
                 if contactUserData is not None:
-                    if 'player' in contactUserData:
-                        return
                     if 'enemy' in contactUserData:
                         enemy : Enemy = contactUserData['enemy']
                         enemy.takeDamage(2)
@@ -63,6 +60,7 @@ def killEnemies(room):
     for enemy in room.enemies:
         if enemy.lives <= 0:
             room.enemies.remove(enemy)
+
 
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:

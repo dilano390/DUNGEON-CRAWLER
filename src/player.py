@@ -19,9 +19,10 @@ class Player:
         self.b2Object = self.world.CreateDynamicBody(
             position=(self.b2PyHelper.convertTupleToB2Vec2(position)),
             shapes=(self.b2Helper.createPolygon(0, 0, 10, 10)))
-        self.b2Object.userData = {'player': True}
         self.sensitivity = sensitivity
         self.bullets = bullets
+        self.lives = 5
+        self.lastDamageTime = 0
 
     def determineVelocity(self) -> None:
         velY = 0
@@ -36,6 +37,14 @@ class Player:
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             velX -= self.sensitivity
         self.b2Object.linearVelocity = Box2D.b2Vec2(velX, velY)
+
+    def playerTakeDamage(self):
+        if pygame.time.get_ticks() - self.lastDamageTime > 1000:
+            self.lives -= 1
+            self.lastDamageTime = pygame.time.get_ticks()
+            print(f"Took damage, now {self.lives} left")
+        else:
+            print("damage on cooldown")
 
     def shoot(self) -> None:
         mousePos = self.b2PyHelper.flipYaxis(pygame.mouse.get_pos())
@@ -53,4 +62,3 @@ class Player:
         self.bullets.append(
             Bullet(self.b2PyHelper.convertTupleToB2Vec2(playerPos), self.b2PyHelper.convertTupleToB2Vec2(bullet_vector),
                    50, self.world, self.b2PyHelper, self.b2Helper))
-

@@ -4,7 +4,8 @@ import pygame
 
 from dungeonGameInstance import DungeonGameInstance
 from enemy import Enemy
-from gameFlow import setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets, killEnemies
+from gameFlow import (setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets,
+                      killEnemies)
 from dungeonHelper import updateAllEnemiesInList
 pygame.display.set_caption("Dilano Emanuel Jermaine Doelwijt G20230417")
 
@@ -48,13 +49,14 @@ def main() -> None:
         killEnemies(currentRoom)
         updateAllEnemiesInList(currentRoom.enemies,player.b2Object)
 
+
         pygame.display.flip()
 
         dungeon.trackAndChangeRoom(b2pyh.convertB2Vec2toTuple(player.b2Object.position))
 
         checkBullets(gameInstance)
         bulletDecay(gameInstance, world)
-
+        # checkPlayerCollisions(gameInstance)
         world.Step(gameInstance.TIME_STEP, 10, 10)
         clock.tick(gameInstance.FPS)
 
