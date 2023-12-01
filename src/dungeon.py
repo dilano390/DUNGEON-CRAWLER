@@ -107,7 +107,6 @@ class Dungeon:
 
             if not overlap:
                 return side  # Return the side if no overlap
-        print("FAILED TO FIND")
         return None  # Return None if no non-overlapping side is found
 
     def addRoom(self, w: int, h: int) -> None:

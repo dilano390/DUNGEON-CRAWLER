@@ -1,9 +1,11 @@
+import math
 from typing import Tuple
 
 import Box2D
 import pygame
 from enemy import Enemy
 from b2PyHelper import B2PyHelper
+from b2Helper import B2Helper
 from dungeonGameInstance import DungeonGameInstance
 from player import Player
 
@@ -15,7 +17,6 @@ def setUpCrosshair(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, world: 
     crosshair.fixtures[0].filterData.categoryBits = gameInstance.NON_COLLIDING_CATEGORY
     crosshair.fixtures[0].filterData.maskBits = gameInstance.NON_COLLIDING_MASK
     return crosshair
-
 
 def handleEvents(gameInstance: DungeonGameInstance) -> None:
     for event in pygame.event.get():
@@ -42,12 +43,25 @@ def checkBullets(gameInstance: DungeonGameInstance):
             for contact in bullet.body.contacts:
                 contactUserData = contact.other.userData
                 if contactUserData is not None:
+                    if 'player' in contactUserData: # DO NOT REMOVE. IF YOU REMOVE YOU CAUSE GHOST BULLETS
+                        return
                     if 'enemy' in contactUserData:
                         enemy : Enemy = contactUserData['enemy']
                         enemy.takeDamage(2)
             gameInstance.bulletsUpForDeletion.append(bullet)
             bullet.impactTime = pygame.time.get_ticks()
             gameInstance.bullets.remove(bullet)
+
+
+def checkPlayerHits(gameInstance : DungeonGameInstance):
+    body = gameInstance.player.b2Object
+    player = gameInstance.player
+    if len(body.contacts):
+        for contact in body.contacts:
+            contactUserData = contact.other.userData
+            if contactUserData is not None:
+                if 'enemy' in contactUserData:
+                    player.playerTakeDamage(gameInstance)
 
 
 def bulletDecay(gameInstance: DungeonGameInstance, world: Box2D.b2World) -> None:
@@ -61,9 +75,15 @@ def killEnemies(room):
         if enemy.lives <= 0:
             room.enemies.remove(enemy)
 
-
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
+
+    x = 10
+    for i in range(gameInstance.player.lives):
+        screen.blit(gameInstance.heartImage, (x, 0))
+        x += 50
+
+
     for body in world.bodies:
         for fixture in body.fixtures:
             shape = fixture.shape
@@ -85,3 +105,14 @@ def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygam
                             color = body.userData['color']
 
                     pygame.draw.polygon(screen, color, vertices)
+
+
+
+
+
+def rotate_image_towards_cursor(image, x ,y):
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    rel_x, rel_y = mouse_x - x, mouse_y - y
+    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+    imageRot = pygame.transform.rotate(image, int(angle))
+    return imageRot

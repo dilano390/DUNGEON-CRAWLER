@@ -29,7 +29,6 @@ class Enemy:
         self.b2Object.linearDamping = 5
         self.b2Object.fixtures[0].friction = 3
         self.b2Object.userData = {'enemy': self, 'color': tuple((255, 100, 0))}
-        print(self.b2Object)
 
     def takeDamage(self, damage):
         color = self.b2Object.userData['color']
@@ -37,7 +36,6 @@ class Enemy:
         red = self.constrain(red, 155, 255)
         self.b2Object.userData['color'] = tuple((red, color[1], color[2]))
         self.lives -= damage
-        print(f"Taking damage, current hp:{self.lives}")
         if self.lives <= 0:
             self.world.DestroyBody(self.b2Object)
 

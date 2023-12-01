@@ -1,12 +1,14 @@
 import random
 
+import Box2D
 import pygame
 
 from dungeonGameInstance import DungeonGameInstance
 from enemy import Enemy
 from gameFlow import (setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets,
-                      killEnemies)
+                      killEnemies, checkPlayerHits)
 from dungeonHelper import updateAllEnemiesInList
+
 pygame.display.set_caption("Dilano Emanuel Jermaine Doelwijt G20230417")
 
 
@@ -47,7 +49,9 @@ def main() -> None:
         drawGame(b2pyh, gameInstance, screen, world)
 
         killEnemies(currentRoom)
-        updateAllEnemiesInList(currentRoom.enemies,player.b2Object)
+        updateAllEnemiesInList(currentRoom.enemies, player.b2Object)
+
+        checkPlayerHits(gameInstance)
 
 
         pygame.display.flip()
@@ -56,7 +60,7 @@ def main() -> None:
 
         checkBullets(gameInstance)
         bulletDecay(gameInstance, world)
-        # checkPlayerCollisions(gameInstance)
+
         world.Step(gameInstance.TIME_STEP, 10, 10)
         clock.tick(gameInstance.FPS)
 

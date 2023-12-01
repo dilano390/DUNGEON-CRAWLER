@@ -31,8 +31,12 @@ class DungeonGameInstance:
         self.b2PyHelper = B2PyHelper(self.PPM, self.cameraOffset, self.INPUT_SENSITIVITY, self.WINDOW_HEIGHT)
         self.b2Helper = B2Helper(self.world, self.PPM)
         self.bullets = []
-        self.player : Player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2PyHelper, self.b2Helper,
-                             self.cameraOffset, self.world, self.INPUT_SENSITIVITY, self.bullets)
-        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2,700,30,self.world, 200, 70, self.b2Helper,
+        self.player: Player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2PyHelper,
+                                     self.b2Helper,
+                                     self.cameraOffset, self.world, self.INPUT_SENSITIVITY, self.bullets)
+        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, 700, 30, self.world, 200, 70,
+                                       self.b2Helper,
                                        self.b2PyHelper, spawnEnemy)
 
+        self.heartImage = pygame.image.load("assets/heart.png") #TODO ADD THE OS PATH JOIN SHIT
+        self.heartImage = pygame.transform.scale(self.heartImage,(64,64))
