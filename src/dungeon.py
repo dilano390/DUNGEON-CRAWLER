@@ -1,10 +1,13 @@
 import random
+
 import Box2D
+
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from dungeonHelper import Side, flipSide, checkCollision
 # from player import Player
 from room import Room
+
 
 class Dungeon:
     def __init__(self, x: int, y: int, roomWH: int, roomCount: int, world: Box2D.b2World,
@@ -28,18 +31,15 @@ class Dungeon:
         self.roomChanged = False
         self.roomCount = len(self.rooms)
 
-
     def trackAndChangeRoom(self, playerPosition):
 
         for room in self.rooms:
-            if checkCollision(playerPosition[0], playerPosition[1], 10, 10, room.x + 10, room.y + 10, room.w - 20, room.h - 20):
+            if checkCollision(playerPosition[0], playerPosition[1], 10, 10, room.x + 10, room.y + 10, room.w - 20,
+                              room.h - 20):
                 if not self.currentRoom == room and room not in self.visited:
                     self.visited.append(room)
                     self.enemySpawnFunc(room, self.b2pyh, self.b2h, self.world)
                     room.closeRoom()
-
-
-
 
                 self.currentRoom = room
                 if not len(self.currentRoom.enemies) and self.currentRoom.closed:
@@ -107,7 +107,6 @@ class Dungeon:
 
             if not overlap:
                 return side  # Return the side if no overlap
-        print("FAILED TO FIND")
         return None  # Return None if no non-overlapping side is found
 
     def addRoom(self, w: int, h: int) -> None:
@@ -123,7 +122,7 @@ class Dungeon:
         corridors[side.value] = True
 
         room = Room(self.x, self.y, w, h, corridors, self.corridorWidth, side, self.world, self.b2h, self.b2pyh)
-        self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x, self.y), shapes=room.walls)
+        body = self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x, self.y), shapes=room.walls)
         # TODO REMOVE THIS CALL TO BOX2D FROM THIS CLASS
         self.addCorridor(side, w, h)
         self.rooms.append(room)

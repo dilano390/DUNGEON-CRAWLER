@@ -6,6 +6,7 @@ from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from dungeonHelper import Side
 
+
 class Room:
     def __init__(self, x: int, y: int, w: int, h: int, corridorSides: List[Side], corridorWidth: int, side: Side,
                  world: Box2D.b2World, b2h: B2Helper, b2pyh: B2PyHelper):
@@ -20,10 +21,10 @@ class Room:
         self.enemies = []
         self.doorBlocker = None
         self.doorBlockers = []
-        self.doorBlockers.append(self.b2h.createEdge(0,self.h,0,0))
-        self.doorBlockers.append(self.b2h.createEdge(0,self.h,self.w,0))
-        self.doorBlockers.append(self.b2h.createEdge(self.w,0,0,self.h))
-        self.doorBlockers.append(self.b2h.createEdge(self.w,0,0,0))
+        self.doorBlockers.append(self.b2h.createEdge(0, self.h, 0, 0))
+        self.doorBlockers.append(self.b2h.createEdge(0, self.h, self.w, 0))
+        self.doorBlockers.append(self.b2h.createEdge(self.w, 0, 0, self.h))
+        self.doorBlockers.append(self.b2h.createEdge(self.w, 0, 0, 0))
         left = self.b2h.createEdge(0, h, 0, 0)
         top = self.b2h.createEdge(w, 0, 0, h)
         bottom = self.b2h.createEdge(w, 0, 0, 0)
@@ -43,15 +44,15 @@ class Room:
                 self.createWall(Side(i), corridorWidth, h, w)
 
     def closeRoom(self):
-        self.doorBlocker = self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x,self.y),shapes=self.doorBlockers)
+        self.doorBlocker = self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x, self.y),
+                                                       shapes=self.doorBlockers)
         self.closed = True
         return
+
     def openRoom(self):
         self.world.DestroyBody(self.doorBlocker)
         self.closed = False
         return
-
-
 
     def createWall(self, corridorSide: Side, corridorWidth: int, h: int, w: int) -> None:
         if corridorSide == Side.TOP:

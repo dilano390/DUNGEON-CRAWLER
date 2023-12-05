@@ -3,6 +3,7 @@ from typing import List
 
 from enemy import Enemy
 
+
 class Axis(Enum):
     HORIZONTAL = 0
     VERTICAL = 1
@@ -21,7 +22,8 @@ def flipSide(side: Side) -> Side:
     if side == Side.TOP: return Side.BOTTOM
     if side == Side.BOTTOM: return Side.TOP
 
-def updateAllEnemiesInList(theList : List[Enemy],target):
+
+def updateAllEnemiesInList(theList: List[Enemy], target):
     for e in theList:
         e.update(target)
 

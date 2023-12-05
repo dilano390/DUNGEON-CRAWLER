@@ -4,8 +4,8 @@ import pygame
 import dungeon
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
-from player import Player
 from enemySpawner import spawnEnemy
+from player import Player
 
 
 class DungeonGameInstance:
@@ -31,8 +31,22 @@ class DungeonGameInstance:
         self.b2PyHelper = B2PyHelper(self.PPM, self.cameraOffset, self.INPUT_SENSITIVITY, self.WINDOW_HEIGHT)
         self.b2Helper = B2Helper(self.world, self.PPM)
         self.bullets = []
-        self.player : Player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2PyHelper, self.b2Helper,
-                             self.cameraOffset, self.world, self.INPUT_SENSITIVITY, self.bullets)
-        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2,700,30,self.world, 200, 70, self.b2Helper,
+        self.player: Player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2PyHelper,
+                                     self.b2Helper,
+                                     self.cameraOffset, self.world, self.INPUT_SENSITIVITY, self.bullets)
+        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, 700, 30, self.world, 200, 70,
+                                       self.b2Helper,
                                        self.b2PyHelper, spawnEnemy)
 
+        self.heartImage = pygame.image.load("assets/heart.png")  # TODO ADD THE OS PATH JOIN
+        self.heartImage = pygame.transform.scale(self.heartImage, (64, 64))
+        self.wallImageV = pygame.image.load("assets/wallV.png")  # TODO ADD THE OS PATH JOIN
+        self.wallImageV = pygame.transform.scale(self.wallImageV, (20, 700))
+        self.wallImageH = pygame.image.load("assets/wallH.png")  # TODO ADD THE OS PATH JOIN
+        self.wallImageH = pygame.transform.scale(self.wallImageH, (700, 20))
+        self.background = pygame.image.load("assets/background.png")  # TODO ADD THE OS PATH JOIN
+        self.playerImage = pygame.image.load("assets/player.png")  # TODO ADD THE OS PATH JOIN
+        self.playerImage = pygame.transform.scale(self.playerImage, (10, 10))
+        self.enemyImage = pygame.image.load("assets/enemy.png")  # TODO ADD THE OS PATH JOIN
+        self.enemyImage = pygame.transform.scale(self.enemyImage, (20, 20))
+        self.crosshairImage = pygame.image.load("assets/crosshair.png")
