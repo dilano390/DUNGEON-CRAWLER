@@ -44,9 +44,9 @@ class DungeonGameInstance:
         self.wallImageV = pygame.transform.scale(self.wallImageV, (20, 700))
         self.wallImageH = pygame.image.load("assets/wallH.png")  # TODO ADD THE OS PATH JOIN
         self.wallImageH = pygame.transform.scale(self.wallImageH, (700, 20))
-        self.background = pygame.image.load("assets/background.png") # TODO ADD THE OS PATH JOIN
-        self.playerImage = pygame.image.load("assets/player.png") # TODO ADD THE OS PATH JOIN
-        self.playerImage = pygame.transform.scale(self.playerImage,(10,10))
-        self.enemyImage = pygame.image.load("assets/enemy.png") # TODO ADD THE OS PATH JOIN
-        self.enemyImage = pygame.transform.scale(self.enemyImage,(20,20))
+        self.background = pygame.image.load("assets/background.png")  # TODO ADD THE OS PATH JOIN
+        self.playerImage = pygame.image.load("assets/player.png")  # TODO ADD THE OS PATH JOIN
+        self.playerImage = pygame.transform.scale(self.playerImage, (10, 10))
+        self.enemyImage = pygame.image.load("assets/enemy.png")  # TODO ADD THE OS PATH JOIN
+        self.enemyImage = pygame.transform.scale(self.enemyImage, (20, 20))
         self.crosshairImage = pygame.image.load("assets/crosshair.png")

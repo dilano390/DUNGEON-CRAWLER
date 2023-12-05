@@ -79,8 +79,7 @@ def killEnemies(room):
 
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
-
-    screen.blit(gameInstance.background,(0,0))
+    screen.blit(gameInstance.background, (0, 0))
     x = 10
     for i in range(gameInstance.player.lives):
         screen.blit(gameInstance.heartImage, (x, 0))
@@ -91,9 +90,7 @@ def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygam
             shape = fixture.shape
             if isinstance(shape, Box2D.b2CircleShape):
                 pos = b2pyh.flipYaxis(b2pyh.convertB2Vec2toTuple(body.position))
-                screen.blit(gameInstance.crosshairImage,(pos[0] -8 , pos[1] -8))
-                # pygame.draw.circle(screen, (255, 0, 100), pos,
-                #                    shape.radius * gameInstance.PPM)
+                screen.blit(gameInstance.crosshairImage, (pos[0] - 8, pos[1] - 8))
             else:
                 vertices = [(body.transform * v) * gameInstance.PPM for v in shape.vertices]
                 vertices = [(v[0], gameInstance.WINDOW_HEIGHT - v[1]) for v in vertices]
@@ -111,8 +108,8 @@ def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygam
                             color = body.userData['color']
                             pygame.draw.polygon(screen, color, vertices)
                         if 'player' in body.userData:
-                            screen.blit(gameInstance.playerImage,(vertices[0][0] - 10,vertices[1][1]))
+                            screen.blit(gameInstance.playerImage, (vertices[0][0] - 10, vertices[1][1]))
                         if 'enemy' in body.userData:
-                            screen.blit(gameInstance.enemyImage,(vertices[0][0] - 20,vertices[1][1]))
+                            screen.blit(gameInstance.enemyImage, (vertices[0][0] - 20, vertices[1][1]))
                     else:
                         pygame.draw.polygon(screen, color, vertices)

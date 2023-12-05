@@ -1,8 +1,10 @@
 import random
+
 import Box2D
 
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
+
 
 class Enemy:
     def __init__(self, cagePos: tuple, cageDim: tuple, lives: int, speed: int, b2PyHelper: B2PyHelper,
@@ -17,15 +19,15 @@ class Enemy:
         self.direction = (0, 0)
         self.w = 20
         self.h = 20
-        self.x = self.constrain(self.getRandomNumber(0,cageDim[0]), 0 + self.w + 5, self.cageDim[0] - self.w - 5) + \
+        self.x = self.constrain(self.getRandomNumber(0, cageDim[0]), 0 + self.w + 5, self.cageDim[0] - self.w - 5) + \
                  cagePos[0]
-        self.y = self.constrain(self.getRandomNumber(0,cageDim[1]), 0 + self.h + 5, self.cageDim[1] - self.h - 5) + \
+        self.y = self.constrain(self.getRandomNumber(0, cageDim[1]), 0 + self.h + 5, self.cageDim[1] - self.h - 5) + \
                  cagePos[1]
         self.pos = tuple((self.x, self.y))
         self.b2Object = self.world.CreateDynamicBody(
             position=(self.b2PyHelper.convertCordsToB2Vec2(self.x, self.y)),
             shapes=(self.b2Helper.createPolygon(0, 0, self.w, self.h)))
-        self.b2Object.mass = self.getRandomNumber(10,40)
+        self.b2Object.mass = self.getRandomNumber(10, 40)
         self.b2Object.linearDamping = 5
         self.b2Object.fixtures[0].friction = 3
         self.b2Object.userData = {'enemy': self, 'color': tuple((255, 100, 0))}
@@ -67,5 +69,5 @@ class Enemy:
         return min(max_val, max(min_val, val))
 
     @staticmethod
-    def getRandomNumber(lower,upper):
+    def getRandomNumber(lower, upper):
         return random.randrange(lower, upper)

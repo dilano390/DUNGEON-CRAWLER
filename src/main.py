@@ -1,13 +1,9 @@
-import random
-
-import Box2D
 import pygame
 
 from dungeonGameInstance import DungeonGameInstance
-from enemy import Enemy
+from dungeonHelper import updateAllEnemiesInList
 from gameFlow import (setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets,
                       killEnemies, checkPlayerHits)
-from dungeonHelper import updateAllEnemiesInList
 
 pygame.display.set_caption("Dilano Emanuel Jermaine Doelwijt G20230417")
 
@@ -52,7 +48,6 @@ def main() -> None:
         updateAllEnemiesInList(currentRoom.enemies, player.b2Object)
 
         checkPlayerHits(gameInstance)
-
 
         pygame.display.flip()
 
