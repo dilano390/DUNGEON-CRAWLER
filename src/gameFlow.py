@@ -8,6 +8,8 @@ from b2PyHelper import B2PyHelper
 from b2Helper import B2Helper
 from dungeonGameInstance import DungeonGameInstance
 from player import Player
+from src.dungeonHelper import Side
+from wallObject import WallsBody
 
 
 def setUpCrosshair(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, world: Box2D.b2World) -> Box2D.b2Body:
@@ -17,6 +19,7 @@ def setUpCrosshair(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, world: 
     crosshair.fixtures[0].filterData.categoryBits = gameInstance.NON_COLLIDING_CATEGORY
     crosshair.fixtures[0].filterData.maskBits = gameInstance.NON_COLLIDING_MASK
     return crosshair
+
 
 def handleEvents(gameInstance: DungeonGameInstance) -> None:
     for event in pygame.event.get():
@@ -43,17 +46,17 @@ def checkBullets(gameInstance: DungeonGameInstance):
             for contact in bullet.body.contacts:
                 contactUserData = contact.other.userData
                 if contactUserData is not None:
-                    if 'player' in contactUserData: # DO NOT REMOVE. IF YOU REMOVE YOU CAUSE GHOST BULLETS
+                    if 'player' in contactUserData:  # DO NOT REMOVE. IF YOU REMOVE YOU CAUSE GHOST BULLETS
                         return
                     if 'enemy' in contactUserData:
-                        enemy : Enemy = contactUserData['enemy']
+                        enemy: Enemy = contactUserData['enemy']
                         enemy.takeDamage(2)
             gameInstance.bulletsUpForDeletion.append(bullet)
             bullet.impactTime = pygame.time.get_ticks()
             gameInstance.bullets.remove(bullet)
 
 
-def checkPlayerHits(gameInstance : DungeonGameInstance):
+def checkPlayerHits(gameInstance: DungeonGameInstance):
     body = gameInstance.player.b2Object
     player = gameInstance.player
     if len(body.contacts):
@@ -70,19 +73,21 @@ def bulletDecay(gameInstance: DungeonGameInstance, world: Box2D.b2World) -> None
             world.DestroyBody(bullet.body)
             gameInstance.bulletsUpForDeletion.remove(bullet)
 
+
 def killEnemies(room):
     for enemy in room.enemies:
         if enemy.lives <= 0:
             room.enemies.remove(enemy)
 
+
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
-
     x = 10
     for i in range(gameInstance.player.lives):
         screen.blit(gameInstance.heartImage, (x, 0))
         x += 50
-
+    # screen.blit(gameInstance.wallImageH,(0,0))
+    # screen.blit(gameInstance.wallImageV,(0,0))
 
     for body in world.bodies:
         for fixture in body.fixtures:
@@ -97,22 +102,48 @@ def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygam
                 b2pyh.offsetBodies(vertices)
 
                 if isinstance(shape, Box2D.b2EdgeShape):
-                    pygame.draw.line(screen, (0, 155, 255), vertices[0], vertices[1], 3)
+
+                    if body.userData is not None:
+                        if 'wall' in body.userData:
+                            wallData: WallsBody = body.userData['wall']
+                            x1, y1 = vertices[0]
+                            x2, y2 = vertices[1]
+                            xO, yO = wallData.roomXY
+                            if abs(x1 - x2) <= 5:
+                                if abs(xO - x1) >= 5:
+                                    # Right
+                                    if wallData.corridors[Side.RIGHT.value]:
+                                        pass
+                                    else:
+                                        screen.blit(gameInstance.wallImageV,vertices[0])
+                                else:
+                                    # Left
+                                    if wallData.corridors[Side.LEFT.value]:
+                                        pass
+                                    else:
+                                        screen.blit(gameInstance.wallImageV,vertices[0])
+                            else:
+                                if abs(yO - y1) >= 5:
+                                    # Bottom
+                                    if wallData.corridors[Side.BOTTOM.value]:
+                                        pass
+                                    else:
+                                        screen.blit(gameInstance.wallImageH,vertices[0])
+                                else:
+                                    # Top
+                                    if wallData.corridors[Side.TOP.value]:
+                                        pass
+                                    else:
+                                        screen.blit(gameInstance.wallImageH,vertices[0])
+
+
+
+                    else:
+                        pygame.draw.line(screen, (0, 155, 255), vertices[0], vertices[1], 3)
                 elif isinstance(shape, Box2D.b2PolygonShape):
-                    color = (255,0,0)
+                    color = (255, 0, 0)
                     if body.userData is not None:
                         if 'color' in body.userData:
                             color = body.userData['color']
 
                     pygame.draw.polygon(screen, color, vertices)
-
-
-
-
-
-def rotate_image_towards_cursor(image, x ,y):
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    rel_x, rel_y = mouse_x - x, mouse_y - y
-    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-    imageRot = pygame.transform.rotate(image, int(angle))
-    return imageRot

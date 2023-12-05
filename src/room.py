@@ -5,6 +5,7 @@ import Box2D
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from dungeonHelper import Side
+from wallObject import WallsBody
 
 class Room:
     def __init__(self, x: int, y: int, w: int, h: int, corridorSides: List[Side], corridorWidth: int, side: Side,
@@ -44,6 +45,7 @@ class Room:
 
     def closeRoom(self):
         self.doorBlocker = self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x,self.y),shapes=self.doorBlockers)
+        self.doorBlocker.userData = {'wall' : WallsBody((self.x,self.y),self.w,self.corridors,True)}
         self.closed = True
         return
     def openRoom(self):

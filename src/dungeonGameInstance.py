@@ -4,8 +4,8 @@ import pygame
 import dungeon
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
-from player import Player
 from enemySpawner import spawnEnemy
+from player import Player
 
 
 class DungeonGameInstance:
@@ -38,5 +38,9 @@ class DungeonGameInstance:
                                        self.b2Helper,
                                        self.b2PyHelper, spawnEnemy)
 
-        self.heartImage = pygame.image.load("assets/heart.png") #TODO ADD THE OS PATH JOIN SHIT
-        self.heartImage = pygame.transform.scale(self.heartImage,(64,64))
+        self.heartImage = pygame.image.load("assets/heart.png")  # TODO ADD THE OS PATH JOIN SHIT
+        self.heartImage = pygame.transform.scale(self.heartImage, (64, 64))
+        self.wallImageV = pygame.image.load("assets/wallV.png")  # TODO ADD THE OS PATH JOIN SHIT
+        self.wallImageV = pygame.transform.scale(self.wallImageV, (20, 700))
+        self.wallImageH = pygame.image.load("assets/wallH.png")  # TODO ADD THE OS PATH JOIN SHIT
+        self.wallImageH = pygame.transform.scale(self.wallImageH, (700, 20))
