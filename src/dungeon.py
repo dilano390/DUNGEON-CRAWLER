@@ -5,7 +5,6 @@ from b2PyHelper import B2PyHelper
 from dungeonHelper import Side, flipSide, checkCollision
 # from player import Player
 from room import Room
-from wallObject import WallsBody
 
 class Dungeon:
     def __init__(self, x: int, y: int, roomWH: int, roomCount: int, world: Box2D.b2World,
@@ -124,7 +123,6 @@ class Dungeon:
 
         room = Room(self.x, self.y, w, h, corridors, self.corridorWidth, side, self.world, self.b2h, self.b2pyh)
         body = self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x, self.y), shapes=room.walls)
-        body.userData = {'wall' : WallsBody((self.x,self.y),w,corridors)}
         # TODO REMOVE THIS CALL TO BOX2D FROM THIS CLASS
         self.addCorridor(side, w, h)
         self.rooms.append(room)

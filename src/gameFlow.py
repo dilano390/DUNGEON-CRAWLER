@@ -1,15 +1,12 @@
-import math
 from typing import Tuple
 
 import Box2D
 import pygame
-from enemy import Enemy
+
 from b2PyHelper import B2PyHelper
-from b2Helper import B2Helper
 from dungeonGameInstance import DungeonGameInstance
+from enemy import Enemy
 from player import Player
-from src.dungeonHelper import Side
-from wallObject import WallsBody
 
 
 def setUpCrosshair(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, world: Box2D.b2World) -> Box2D.b2Body:
@@ -82,68 +79,40 @@ def killEnemies(room):
 
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
+
+    screen.blit(gameInstance.background,(0,0))
     x = 10
     for i in range(gameInstance.player.lives):
         screen.blit(gameInstance.heartImage, (x, 0))
         x += 50
-    # screen.blit(gameInstance.wallImageH,(0,0))
-    # screen.blit(gameInstance.wallImageV,(0,0))
 
     for body in world.bodies:
         for fixture in body.fixtures:
             shape = fixture.shape
             if isinstance(shape, Box2D.b2CircleShape):
                 pos = b2pyh.flipYaxis(b2pyh.convertB2Vec2toTuple(body.position))
-                pygame.draw.circle(screen, (255, 0, 100), pos,
-                                   shape.radius * gameInstance.PPM)
+                screen.blit(gameInstance.crosshairImage,(pos[0] -8 , pos[1] -8))
+                # pygame.draw.circle(screen, (255, 0, 100), pos,
+                #                    shape.radius * gameInstance.PPM)
             else:
                 vertices = [(body.transform * v) * gameInstance.PPM for v in shape.vertices]
                 vertices = [(v[0], gameInstance.WINDOW_HEIGHT - v[1]) for v in vertices]
                 b2pyh.offsetBodies(vertices)
 
                 if isinstance(shape, Box2D.b2EdgeShape):
-
-                    if body.userData is not None:
-                        if 'wall' in body.userData:
-                            wallData: WallsBody = body.userData['wall']
-                            x1, y1 = vertices[0]
-                            x2, y2 = vertices[1]
-                            xO, yO = wallData.roomXY
-                            if abs(x1 - x2) <= 5:
-                                if abs(xO - x1) >= 5:
-                                    # Right
-                                    if wallData.corridors[Side.RIGHT.value]:
-                                        pass
-                                    else:
-                                        screen.blit(gameInstance.wallImageV,vertices[0])
-                                else:
-                                    # Left
-                                    if wallData.corridors[Side.LEFT.value]:
-                                        pass
-                                    else:
-                                        screen.blit(gameInstance.wallImageV,vertices[0])
-                            else:
-                                if abs(yO - y1) >= 5:
-                                    # Bottom
-                                    if wallData.corridors[Side.BOTTOM.value]:
-                                        pass
-                                    else:
-                                        screen.blit(gameInstance.wallImageH,vertices[0])
-                                else:
-                                    # Top
-                                    if wallData.corridors[Side.TOP.value]:
-                                        pass
-                                    else:
-                                        screen.blit(gameInstance.wallImageH,vertices[0])
-
-
-
+                    if abs(vertices[0][0] - vertices[1][0]) <= 5:
+                        pygame.draw.line(screen, (66, 12, 55), vertices[0], vertices[1], 3)
                     else:
-                        pygame.draw.line(screen, (0, 155, 255), vertices[0], vertices[1], 3)
+                        pygame.draw.line(screen, (66, 12, 55), vertices[0], vertices[1], 3)
                 elif isinstance(shape, Box2D.b2PolygonShape):
                     color = (255, 0, 0)
                     if body.userData is not None:
                         if 'color' in body.userData:
                             color = body.userData['color']
-
-                    pygame.draw.polygon(screen, color, vertices)
+                            pygame.draw.polygon(screen, color, vertices)
+                        if 'player' in body.userData:
+                            screen.blit(gameInstance.playerImage,(vertices[0][0] - 10,vertices[1][1]))
+                        if 'enemy' in body.userData:
+                            screen.blit(gameInstance.enemyImage,(vertices[0][0] - 20,vertices[1][1]))
+                    else:
+                        pygame.draw.polygon(screen, color, vertices)
