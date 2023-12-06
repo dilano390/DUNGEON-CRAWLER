@@ -4,7 +4,10 @@ import pygame
 import dungeon
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
+from dungeonHelper import updateAllEnemiesInList
 from enemySpawner import spawnEnemy
+from gameFlow import (setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets,
+                      killEnemies, checkPlayerHits)
 from player import Player
 
 
@@ -39,6 +42,8 @@ class DungeonGameInstance:
                                        self.b2_helper,
                                        self.b2_py_helper, spawnEnemy)
 
+        self.crosshair = setUpCrosshair(self.b2_py_helper, self, self.world)
+
         self.heart_image = pygame.image.load("assets/heart.png")  # TODO ADD THE OS PATH JOIN
         self.heart_image = pygame.transform.scale(self.heart_image, (64, 64))
         self.wall_image_v = pygame.image.load("assets/wallV.png")  # TODO ADD THE OS PATH JOIN
@@ -55,13 +60,33 @@ class DungeonGameInstance:
         self.bullet_image = pygame.image.load("assets/bullet.png")
         self.bullet_image = pygame.transform.scale(self.bullet_image, (5, 5))
 
+        self.prev_x = self.player.b2_object.position[0]
+        self.prev_y = self.player.b2_object.position[1]
 
     def handle_graphics(self):
-        pass
+        self.screen.fill((80, 80, 80))
+        self.crosshair.position = self.b2_py_helper.convert_tuple_to_b2_vec2(
+            self.b2_py_helper.flip_y_axis(pygame.mouse.get_pos()))
+        drawGame(self.b2_py_helper, self, self.screen, self.world)
+        pygame.display.flip()
+
     def handle_logic(self):
-        pass
+        current_room = self.dungeon.current_room
+        self.prev_x, self.prev_y = determineCameraOffset(self, self.player, self.prev_x, self.prev_y)
+        killEnemies(current_room)
+        checkPlayerHits(self)
+        updateAllEnemiesInList(current_room.enemies, self.player.b2_object)
+        self.dungeon.track_and_change_room(self.b2_py_helper.convert_b2_vec2_to_tuple(self.player.b2_object.position))
+        checkBullets(self)
+        bulletDecay(self, self.world)
+
+        self.world.Step(self.TIME_STEP, 10, 10)
+        self.clock.tick(self.FPS)
+
     def handle_input(self):
-        pass
+        self.player.determine_velocity()
+        handleEvents(self)
+
 # TODO ADD QUESTION MARK BUTTON THAT WILL SHOW KEYS
 # TODO MAIN MENU
 # TODO GAME OVER SCREEN
