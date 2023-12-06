@@ -44,6 +44,8 @@ class Dungeon:
                 self.currentRoom = room
                 if not len(self.currentRoom.enemies) and self.currentRoom.closed:
                     self.currentRoom.openRoom()
+                    if self.rooms[-1] == room:
+                        print("You win")  # TODO: END THE GAME LOOP -> PROGRESS TO WIN SCREEN
                 return
 
     def addCorridor(self, side: Side, roomW: int, roomH: int) -> None:

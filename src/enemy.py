@@ -6,7 +6,7 @@ from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 
 
-class Enemy:
+class Enemy:  # TODO ADD BOSSES
     def __init__(self, cagePos: tuple, cageDim: tuple, lives: int, speed: int, b2PyHelper: B2PyHelper,
                  b2Helper: B2Helper, world: Box2D.b2World):
         self.lives = lives

@@ -79,11 +79,11 @@ def killEnemies(room):
 
 def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
-    screen.blit(gameInstance.background, (0, 0))
-    x = 10
-    for i in range(gameInstance.player.lives):
-        screen.blit(gameInstance.heartImage, (x, 0))
-        x += 50
+    screen.blit(gameInstance.background, tuple((
+        gameInstance.cameraOffset[0] - (5000 + gameInstance.backgroundOffset[0]),
+        gameInstance.cameraOffset[1] - (
+                5000 + gameInstance.backgroundOffset[1]))))
+    offsetBackground(gameInstance)
 
     for body in world.bodies:
         for fixture in body.fixtures:
@@ -111,5 +111,22 @@ def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygam
                             screen.blit(gameInstance.playerImage, (vertices[0][0] - 10, vertices[1][1]))
                         if 'enemy' in body.userData:
                             screen.blit(gameInstance.enemyImage, (vertices[0][0] - 20, vertices[1][1]))
+                        if 'bullet' in body.userData:
+                            screen.blit(gameInstance.bulletImage, (vertices[0][0] - 5, vertices[1][1]))
                     else:
                         pygame.draw.polygon(screen, color, vertices)
+    x = 10
+    for i in range(gameInstance.player.lives):
+        screen.blit(gameInstance.heartImage, (x, 0))
+        x += 50
+
+
+def offsetBackground(gameInstance):
+    if gameInstance.cameraOffset[0] - gameInstance.backgroundOffset[0] > 4000:
+        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0] + 4000, gameInstance.backgroundOffset[1])
+    if gameInstance.cameraOffset[1] - gameInstance.backgroundOffset[1] > 4000:
+        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0], gameInstance.backgroundOffset[1] + 4000)
+    if gameInstance.cameraOffset[0] - gameInstance.backgroundOffset[0] < -4000:
+        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0] - 4000, gameInstance.backgroundOffset[1])
+    if gameInstance.cameraOffset[1] - gameInstance.backgroundOffset[1] < -4000:
+        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0], gameInstance.backgroundOffset[1] - 4000)

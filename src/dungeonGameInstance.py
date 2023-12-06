@@ -31,10 +31,11 @@ class DungeonGameInstance:
         self.b2PyHelper = B2PyHelper(self.PPM, self.cameraOffset, self.INPUT_SENSITIVITY, self.WINDOW_HEIGHT)
         self.b2Helper = B2Helper(self.world, self.PPM)
         self.bullets = []
+        self.backgroundOffset = (0, 0)
         self.player: Player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2PyHelper,
                                      self.b2Helper,
                                      self.cameraOffset, self.world, self.INPUT_SENSITIVITY, self.bullets)
-        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, 700, 30, self.world, 200, 70,
+        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, 700, 15, self.world, 200, 70,
                                        self.b2Helper,
                                        self.b2PyHelper, spawnEnemy)
 
@@ -45,8 +46,18 @@ class DungeonGameInstance:
         self.wallImageH = pygame.image.load("assets/wallH.png")  # TODO ADD THE OS PATH JOIN
         self.wallImageH = pygame.transform.scale(self.wallImageH, (700, 20))
         self.background = pygame.image.load("assets/background.png")  # TODO ADD THE OS PATH JOIN
+        self.background = pygame.transform.scale(self.background, (10000, 10000))
         self.playerImage = pygame.image.load("assets/player.png")  # TODO ADD THE OS PATH JOIN
         self.playerImage = pygame.transform.scale(self.playerImage, (10, 10))
         self.enemyImage = pygame.image.load("assets/enemy.png")  # TODO ADD THE OS PATH JOIN
-        self.enemyImage = pygame.transform.scale(self.enemyImage, (20, 20))
+        self.enemyImage = pygame.transform.scale(self.enemyImage, (23, 23))
         self.crosshairImage = pygame.image.load("assets/crosshair.png")
+        self.bulletImage = pygame.image.load("assets/bullet.png")
+        self.bulletImage = pygame.transform.scale(self.bulletImage, (5, 5))
+# TODO ADD QUESTION MARK BUTTON THAT WILL SHOW KEYS
+# TODO MAIN MENU
+# TODO GAME OVER SCREEN
+# TODO PAUSE BUTTON
+# TODO ADD PROGRESS TRACKER
+# TODO ADD TIMER
+# TODO ADD HIGHSCORES FROM THE TIME
