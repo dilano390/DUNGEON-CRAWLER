@@ -4,12 +4,11 @@ import Box2D
 import pygame
 
 from b2PyHelper import B2PyHelper
-from dungeonGameInstance import DungeonGameInstance
 from enemy import Enemy
 from player import Player
 
 
-def setUpCrosshair(b2pyh: B2PyHelper, game_instance: DungeonGameInstance, world: Box2D.b2World) -> Box2D.b2Body:
+def setUpCrosshair(b2pyh: B2PyHelper, game_instance, world: Box2D.b2World) -> Box2D.b2Body:
     crosshair = world.CreateStaticBody(
         position=(b2pyh.convert_tuple_to_b2_vec2(b2pyh.flip_y_axis(pygame.mouse.get_pos()))),
         shapes=(Box2D.b2CircleShape(radius=0.3)))
@@ -18,7 +17,7 @@ def setUpCrosshair(b2pyh: B2PyHelper, game_instance: DungeonGameInstance, world:
     return crosshair
 
 
-def handleEvents(game_instance: DungeonGameInstance) -> None:
+def handleEvents(game_instance) -> None:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_instance.game_active = False
@@ -26,7 +25,7 @@ def handleEvents(game_instance: DungeonGameInstance) -> None:
             game_instance.player.shoot()
 
 
-def determineCameraOffset(game_instance: DungeonGameInstance, player: Player, prev_x: float, prev_y: float) -> Tuple[
+def determineCameraOffset(game_instance, player: Player, prev_x: float, prev_y: float) -> Tuple[
     float, float]:
     dx = (player.b2_object.position[0] - prev_x) * game_instance.PPM
     dy = (player.b2_object.position[1] - prev_y) * game_instance.PPM
@@ -37,7 +36,7 @@ def determineCameraOffset(game_instance: DungeonGameInstance, player: Player, pr
     return prev_x, prev_y
 
 
-def checkBullets(game_instance: DungeonGameInstance):
+def checkBullets(game_instance):
     for bullet in game_instance.bullets:
         handleBullet(bullet, game_instance)
 
@@ -57,7 +56,7 @@ def handleBullet(bullet, game_instance):
         game_instance.bullets.remove(bullet)
 
 
-def checkPlayerHits(game_instance: DungeonGameInstance):
+def checkPlayerHits(game_instance):
     body = game_instance.player.b2_object
     player = game_instance.player
     if len(body.contacts):
@@ -67,7 +66,7 @@ def checkPlayerHits(game_instance: DungeonGameInstance):
                 player.player_take_damage(game_instance)
 
 
-def bulletDecay(game_instance: DungeonGameInstance, world: Box2D.b2World) -> None:
+def bulletDecay(game_instance, world: Box2D.b2World) -> None:
     for bullet in game_instance.bullets_up_for_deletion:
         if pygame.time.get_ticks() - bullet.impact_time > game_instance.BULLET_LIFETIME_AFTER_COLL:
             world.DestroyBody(bullet.body)
@@ -80,7 +79,7 @@ def killEnemies(room):
             room.enemies.remove(enemy)
 
 
-def drawGame(b2pyh: B2PyHelper, game_instance: DungeonGameInstance, screen: pygame.surface,
+def drawGame(b2pyh: B2PyHelper, game_instance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
     drawBackground(game_instance, screen)
     determineBackgroundOffsets(game_instance)

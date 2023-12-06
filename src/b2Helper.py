@@ -22,7 +22,8 @@ class B2Helper:
         return Box2D.b2PolygonShape(vertices=[
             (x, y), (x + w, y), (x + w, y + h), (x, y + h)])
 
-    def add_box_to_world(self, polygon: Box2D.b2PolygonShape, position: Box2D.b2Vec2, mass: float, linear_damping: float,
+    def add_box_to_world(self, polygon: Box2D.b2PolygonShape, position: Box2D.b2Vec2, mass: float,
+                         linear_damping: float,
                          friction: float) -> None:
         box = self.world.CreateDynamicBody(position=position, shapes=polygon)
         box.mass = mass

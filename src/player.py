@@ -10,7 +10,8 @@ from bullet import Bullet
 
 
 class Player:
-    def __init__(self, position: tuple, b2_py_helper: B2PyHelper, b2_helper: B2Helper, camera_offset: Tuple[float, float],
+    def __init__(self, position: tuple, b2_py_helper: B2PyHelper, b2_helper: B2Helper,
+                 camera_offset: Tuple[float, float],
                  world: Box2D.b2World, sensitivity: int, bullets: List[Bullet]):
         self.b2_helper = b2_helper
         self.b2_py_helper = b2_py_helper
@@ -60,5 +61,6 @@ class Player:
         speed = 600
         bullet_vector = [direction[0] * math.sqrt(2) * speed, direction[1] * math.sqrt(2) * speed]
         self.bullets.append(
-            Bullet(self.b2_py_helper.convert_tuple_to_b2_vec2(player_pos), self.b2_py_helper.convert_tuple_to_b2_vec2(bullet_vector),
+            Bullet(self.b2_py_helper.convert_tuple_to_b2_vec2(player_pos),
+                   self.b2_py_helper.convert_tuple_to_b2_vec2(bullet_vector),
                    50, self.world, self.b2_py_helper, self.b2_helper))
