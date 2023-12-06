@@ -23,8 +23,8 @@ def flipSide(side: Side) -> Side:
     if side == Side.BOTTOM: return Side.TOP
 
 
-def updateAllEnemiesInList(theList: List[Enemy], target):
-    for e in theList:
+def updateAllEnemiesInList(the_list: List[Enemy], target):
+    for e in the_list:
         e.update(target)
 
 

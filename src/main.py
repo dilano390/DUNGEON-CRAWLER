@@ -12,52 +12,52 @@ def main() -> None:
     pygame.init()
     pygame.mouse.set_visible(False)
 
-    gameInstance = DungeonGameInstance()
-    world = gameInstance.world
-    dungeon = gameInstance.dungeon
-    screen = gameInstance.screen
-    player = gameInstance.player
-    clock = gameInstance.clock
-    b2h = gameInstance.b2Helper
-    b2pyh = gameInstance.b2PyHelper
+    game_instance = DungeonGameInstance()
+    world = game_instance.world
+    dungeon = game_instance.dungeon
+    screen = game_instance.screen
+    player = game_instance.player
+    clock = game_instance.clock
+    b2h = game_instance.b2_helper
+    b2pyh = game_instance.b2_py_helper
 
-    crosshair = setUpCrosshair(b2pyh, gameInstance, world)
+    crosshair = setUpCrosshair(b2pyh, game_instance, world)
 
-    b2h.addBoxToWorld(b2h.createPolygon(10, 30, 30, 30),
-                      b2pyh.convertCordsToB2Vec2(gameInstance.WINDOW_WIDTH / 2, gameInstance.WINDOW_HEIGHT / 2), 20, 2,
-                      1)
+    b2h.add_box_to_world(b2h.create_polygon(10, 30, 30, 30),
+                         b2pyh.convert_cords_to_b2_vec2(game_instance.WINDOW_WIDTH / 2, game_instance.WINDOW_HEIGHT / 2), 20, 2,
+                         1)
 
-    prevX = player.b2Object.position[0]
-    prevY = player.b2Object.position[1]
+    prev_x = player.b2_object.position[0]
+    prev_y = player.b2_object.position[1]
 
-    while gameInstance.gameActive:
-        currentRoom = dungeon.currentRoom
-        handleEvents(gameInstance)
+    while game_instance.game_active:
+        current_room = dungeon.current_room
+        handleEvents(game_instance)
 
-        crosshair.position = b2pyh.convertTupleToB2Vec2(b2pyh.flipYaxis(pygame.mouse.get_pos()))
+        crosshair.position = b2pyh.convert_tuple_to_b2_vec2(b2pyh.flip_y_axis(pygame.mouse.get_pos()))
 
-        prevX, prevY = determineCameraOffset(gameInstance, player, prevX, prevY)
+        prev_x, prev_y = determineCameraOffset(game_instance, player, prev_x, prev_y)
 
-        player.determineVelocity()
+        player.determine_velocity()
 
         screen.fill((80, 80, 80))
 
-        drawGame(b2pyh, gameInstance, screen, world)
+        drawGame(b2pyh, game_instance, screen, world)
 
-        killEnemies(currentRoom)
-        updateAllEnemiesInList(currentRoom.enemies, player.b2Object)
+        killEnemies(current_room)
+        updateAllEnemiesInList(current_room.enemies, player.b2_object)
 
-        checkPlayerHits(gameInstance)
+        checkPlayerHits(game_instance)
 
         pygame.display.flip()
 
-        dungeon.trackAndChangeRoom(b2pyh.convertB2Vec2toTuple(player.b2Object.position))
+        dungeon.track_and_change_room(b2pyh.convert_b2_vec2_to_tuple(player.b2_object.position))
 
-        checkBullets(gameInstance)
-        bulletDecay(gameInstance, world)
+        checkBullets(game_instance)
+        bulletDecay(game_instance, world)
 
-        world.Step(gameInstance.TIME_STEP, 10, 10)
-        clock.tick(gameInstance.FPS)
+        world.Step(game_instance.TIME_STEP, 10, 10)
+        clock.tick(game_instance.FPS)
 
 
 if __name__ == '__main__':

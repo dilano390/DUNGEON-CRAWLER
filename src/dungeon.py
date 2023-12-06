@@ -5,50 +5,49 @@ import Box2D
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from dungeonHelper import Side, flipSide, checkCollision
-# from player import Player
 from room import Room
 
 
 class Dungeon:
-    def __init__(self, x: int, y: int, roomWH: int, roomCount: int, world: Box2D.b2World,
-                 corridorLen: int, corridorWidth: int, b2h: B2Helper,
-                 b2pyh: B2PyHelper, enemySpawner) -> None:
+    def __init__(self, x: int, y: int, room_wh: int, room_count: int, world: Box2D.b2World,
+                 corridor_len: int, corridor_width: int, b2h: B2Helper,
+                 b2pyh: B2PyHelper, enemy_spawner) -> None:
         self.world = world
         self.rooms = []
         self.x = x
         self.y = y
-        self.corridorLen = corridorLen
-        self.corridorWidth = corridorWidth
+        self.corridor_len = corridor_len
+        self.corridor_width = corridor_width
         self.b2h = b2h
         self.b2pyh = b2pyh
-        self.enemySpawnFunc = enemySpawner
-        for i in range(roomCount):
-            self.addRoom(roomWH, roomWH)
+        self.enemy_spawn_func = enemy_spawner
+        for _ in range(room_count):
+            self.add_room(room_wh, room_wh)
         self.visited = [self.rooms[0]]
-        self.currentRoom = self.rooms[0]
-        self.currentRoom.closeRoom()
-        self.enemySpawnFunc(self.rooms[0], self.b2pyh, self.b2h, self.world)
-        self.roomChanged = False
-        self.roomCount = len(self.rooms)
+        self.current_room = self.rooms[0]
+        self.current_room.close_room()
+        self.enemy_spawn_func(self.rooms[0], self.b2pyh, self.b2h, self.world)
+        self.room_changed = False
+        self.room_count = len(self.rooms)
 
-    def trackAndChangeRoom(self, playerPosition):
+    def track_and_change_room(self, player_position):
 
         for room in self.rooms:
-            if checkCollision(playerPosition[0], playerPosition[1], 10, 10, room.x + 10, room.y + 10, room.w - 20,
+            if checkCollision(player_position[0], player_position[1], 10, 10, room.x + 10, room.y + 10, room.w - 20,
                               room.h - 20):
-                if not self.currentRoom == room and room not in self.visited:
+                if self.current_room != room and room not in self.visited:
                     self.visited.append(room)
-                    self.enemySpawnFunc(room, self.b2pyh, self.b2h, self.world)
-                    room.closeRoom()
+                    self.enemy_spawn_func(room, self.b2pyh, self.b2h, self.world)
+                    room.close_room()
 
-                self.currentRoom = room
-                if not len(self.currentRoom.enemies) and self.currentRoom.closed:
-                    self.currentRoom.openRoom()
+                self.current_room = room
+                if not len(self.current_room.enemies) and self.current_room.closed:
+                    self.current_room.open_room()
                     if self.rooms[-1] == room:
                         print("You win")  # TODO: END THE GAME LOOP -> PROGRESS TO WIN SCREEN
                 return
 
-    def addCorridor(self, side: Side, roomW: int, roomH: int) -> None:
+    def add_corridor(self, side: Side, room_w: int, room_h: int) -> None:
         x = self.x
         x2 = self.x
         y = self.y
@@ -56,52 +55,52 @@ class Dungeon:
         h = 0
         w = 0
         if side == Side.RIGHT:
-            x += roomW
+            x += room_w
             x2 = x
-            y += roomH / 2 - self.corridorWidth / 2
-            y2 += roomH / 2 + self.corridorWidth / 2
-            w = self.corridorLen
+            y += room_h / 2 - self.corridor_width / 2
+            y2 += room_h / 2 + self.corridor_width / 2
+            w = self.corridor_len
         elif side == Side.LEFT:
-            y += roomH / 2 - self.corridorWidth / 2
-            y2 += roomH / 2 + self.corridorWidth / 2
-            x -= self.corridorLen
+            y += room_h / 2 - self.corridor_width / 2
+            y2 += room_h / 2 + self.corridor_width / 2
+            x -= self.corridor_len
             x2 = x
-            w = self.corridorLen
+            w = self.corridor_len
         elif side == Side.TOP:
-            y += roomH
+            y += room_h
             y2 = y
-            x += roomW / 2 - self.corridorWidth / 2
-            x2 += roomW / 2 + self.corridorWidth / 2
-            h = self.corridorLen
+            x += room_w / 2 - self.corridor_width / 2
+            x2 += room_w / 2 + self.corridor_width / 2
+            h = self.corridor_len
         else:
-            y -= self.corridorLen
+            y -= self.corridor_len
             y2 = y
-            h = self.corridorLen
-            x += roomW / 2 - self.corridorWidth / 2
-            x2 += roomW / 2 + self.corridorWidth / 2
-        edges = [self.b2h.createEdge(w, h, x, y), self.b2h.createEdge(w, h, x2, y2)]
-        self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(0, 0), shapes=edges)
+            h = self.corridor_len
+            x += room_w / 2 - self.corridor_width / 2
+            x2 += room_w / 2 + self.corridor_width / 2
+        edges = [self.b2h.create_edge(w, h, x, y), self.b2h.create_edge(w, h, x2, y2)]
+        self.world.CreateStaticBody(position=self.b2pyh.convert_cords_to_b2_vec2(0, 0), shapes=edges)
 
-    def adjustForSide(self, x: int, y: int, w: int, h: int, side: Side) -> tuple:
-        newX, newY = x, y
+    def adjust_for_side(self, x: int, y: int, w: int, h: int, side: Side) -> tuple:
+        new_x, new_y = x, y
         if side == Side.LEFT:
-            newX -= self.corridorLen
+            new_x -= self.corridor_len
         elif side == Side.RIGHT:
-            newX += w + self.corridorLen
+            new_x += w + self.corridor_len
         elif side == Side.TOP:
-            newY += h + self.corridorLen
+            new_y += h + self.corridor_len
         else:
-            newY -= self.corridorLen
-        return newX, newY
+            new_y -= self.corridor_len
+        return new_x, new_y
 
-    def findNonOverlappingSide(self, w: int, h: int) -> Side:
+    def find_non_overlapping_side(self, w: int, h: int) -> Side:
         sides = list(Side)
         random.shuffle(sides)  # Shuffle sides to try in random order
 
         for side in sides:
             overlap = False
             for room in self.rooms:
-                new_x, new_y = self.adjustForSide(self.x, self.y, w, h, side)
+                new_x, new_y = self.adjust_for_side(self.x, self.y, w, h, side)
                 if checkCollision(new_x, new_y, w, h, room.x, room.y,
                                   room.w, room.h):
                     overlap = True
@@ -111,28 +110,28 @@ class Dungeon:
                 return side  # Return the side if no overlap
         return None  # Return None if no non-overlapping side is found
 
-    def addRoom(self, w: int, h: int) -> None:
+    def add_room(self, w: int, h: int) -> None:
         corridors = [False, False, False, False]
-        side = self.findNonOverlappingSide(w, h)
+        side = self.find_non_overlapping_side(w, h)
         if len(self.rooms):
-            prevSide = self.rooms[-1].side
-            prevSide = flipSide(prevSide)
-            corridors[prevSide.value] = True
+            prev_side = self.rooms[-1].side
+            prev_side = flipSide(prev_side)
+            corridors[prev_side.value] = True
         if side is None:
             return
 
         corridors[side.value] = True
 
-        room = Room(self.x, self.y, w, h, corridors, self.corridorWidth, side, self.world, self.b2h, self.b2pyh)
-        body = self.world.CreateStaticBody(position=self.b2pyh.convertCordsToB2Vec2(self.x, self.y), shapes=room.walls)
+        room = Room(self.x, self.y, w, h, corridors, self.corridor_width, side, self.world, self.b2h, self.b2pyh)
+        self.world.CreateStaticBody(position=self.b2pyh.convert_cords_to_b2_vec2(self.x, self.y), shapes=room.walls)
         # TODO REMOVE THIS CALL TO BOX2D FROM THIS CLASS
-        self.addCorridor(side, w, h)
+        self.add_corridor(side, w, h)
         self.rooms.append(room)
         if side == Side.TOP:
-            self.y += h + self.corridorLen
+            self.y += h + self.corridor_len
         elif side == Side.LEFT:
-            self.x -= w + self.corridorLen
+            self.x -= w + self.corridor_len
         elif side == Side.RIGHT:
-            self.x += w + self.corridorLen
+            self.x += w + self.corridor_len
         else:
-            self.y -= h + self.corridorLen
+            self.y -= h + self.corridor_len

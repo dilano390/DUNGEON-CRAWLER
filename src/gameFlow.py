@@ -9,66 +9,69 @@ from enemy import Enemy
 from player import Player
 
 
-def setUpCrosshair(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, world: Box2D.b2World) -> Box2D.b2Body:
+def setUpCrosshair(b2pyh: B2PyHelper, game_instance: DungeonGameInstance, world: Box2D.b2World) -> Box2D.b2Body:
     crosshair = world.CreateStaticBody(
-        position=(b2pyh.convertTupleToB2Vec2(b2pyh.flipYaxis(pygame.mouse.get_pos()))),
+        position=(b2pyh.convert_tuple_to_b2_vec2(b2pyh.flip_y_axis(pygame.mouse.get_pos()))),
         shapes=(Box2D.b2CircleShape(radius=0.3)))
-    crosshair.fixtures[0].filterData.categoryBits = gameInstance.NON_COLLIDING_CATEGORY
-    crosshair.fixtures[0].filterData.maskBits = gameInstance.NON_COLLIDING_MASK
+    crosshair.fixtures[0].filterData.categoryBits = game_instance.NON_COLLIDING_CATEGORY
+    crosshair.fixtures[0].filterData.maskBits = game_instance.NON_COLLIDING_MASK
     return crosshair
 
 
-def handleEvents(gameInstance: DungeonGameInstance) -> None:
+def handleEvents(game_instance: DungeonGameInstance) -> None:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            gameInstance.gameActive = False
+            game_instance.game_active = False
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            gameInstance.player.shoot()
+            game_instance.player.shoot()
 
 
-def determineCameraOffset(gameInstance: DungeonGameInstance, player: Player, prevX: float, prevY: float) -> Tuple[
+def determineCameraOffset(game_instance: DungeonGameInstance, player: Player, prev_x: float, prev_y: float) -> Tuple[
     float, float]:
-    dx = (player.b2Object.position[0] - prevX) * gameInstance.PPM
-    dy = (player.b2Object.position[1] - prevY) * gameInstance.PPM
-    prevX = player.b2Object.position[0]
-    prevY = player.b2Object.position[1]
-    gameInstance.cameraOffset[0] -= dx
-    gameInstance.cameraOffset[1] += dy
-    return prevX, prevY
+    dx = (player.b2_object.position[0] - prev_x) * game_instance.PPM
+    dy = (player.b2_object.position[1] - prev_y) * game_instance.PPM
+    prev_x = player.b2_object.position[0]
+    prev_y = player.b2_object.position[1]
+    game_instance.camera_offset[0] -= dx
+    game_instance.camera_offset[1] += dy
+    return prev_x, prev_y
 
 
-def checkBullets(gameInstance: DungeonGameInstance):
-    for bullet in gameInstance.bullets:
-        if len(bullet.body.contacts):
-            for contact in bullet.body.contacts:
-                contactUserData = contact.other.userData
-                if contactUserData is not None:
-                    if 'player' in contactUserData:  # DO NOT REMOVE. IF YOU REMOVE YOU CAUSE GHOST BULLETS
-                        return
-                    if 'enemy' in contactUserData:
-                        enemy: Enemy = contactUserData['enemy']
-                        enemy.takeDamage(2)
-            gameInstance.bulletsUpForDeletion.append(bullet)
-            bullet.impactTime = pygame.time.get_ticks()
-            gameInstance.bullets.remove(bullet)
+def checkBullets(game_instance: DungeonGameInstance):
+    for bullet in game_instance.bullets:
+        handleBullet(bullet, game_instance)
 
 
-def checkPlayerHits(gameInstance: DungeonGameInstance):
-    body = gameInstance.player.b2Object
-    player = gameInstance.player
+def handleBullet(bullet, game_instance):
+    if len(bullet.body.contacts):
+        for contact in bullet.body.contacts:
+            contact_user_data = contact.other.userData
+            if contact_user_data is not None:
+                if 'enemy' in contact_user_data:
+                    enemy: Enemy = contact_user_data['enemy']
+                    enemy.take_damage(2)
+                elif 'player' in contact_user_data:  # DO NOT REMOVE. IF YOU REMOVE YOU CAUSE GHOST BULLETS
+                    return True
+        game_instance.bullets_up_for_deletion.append(bullet)
+        bullet.impact_time = pygame.time.get_ticks()
+        game_instance.bullets.remove(bullet)
+
+
+def checkPlayerHits(game_instance: DungeonGameInstance):
+    body = game_instance.player.b2_object
+    player = game_instance.player
     if len(body.contacts):
         for contact in body.contacts:
-            contactUserData = contact.other.userData
-            if contactUserData is not None:
-                if 'enemy' in contactUserData:
-                    player.playerTakeDamage(gameInstance)
+            contact_user_data = contact.other.userData
+            if contact_user_data is not None and 'enemy' in contact_user_data:
+                player.player_take_damage(game_instance)
 
 
-def bulletDecay(gameInstance: DungeonGameInstance, world: Box2D.b2World) -> None:
-    for bullet in gameInstance.bulletsUpForDeletion:
-        if pygame.time.get_ticks() - bullet.impactTime > gameInstance.BULLET_LIFETIME_AFTER_COLL:
+def bulletDecay(game_instance: DungeonGameInstance, world: Box2D.b2World) -> None:
+    for bullet in game_instance.bullets_up_for_deletion:
+        if pygame.time.get_ticks() - bullet.impact_time > game_instance.BULLET_LIFETIME_AFTER_COLL:
             world.DestroyBody(bullet.body)
-            gameInstance.bulletsUpForDeletion.remove(bullet)
+            game_instance.bullets_up_for_deletion.remove(bullet)
 
 
 def killEnemies(room):
@@ -77,56 +80,80 @@ def killEnemies(room):
             room.enemies.remove(enemy)
 
 
-def drawGame(b2pyh: B2PyHelper, gameInstance: DungeonGameInstance, screen: pygame.surface,
+def drawGame(b2pyh: B2PyHelper, game_instance: DungeonGameInstance, screen: pygame.surface,
              world: Box2D.b2World) -> None:
-    screen.blit(gameInstance.background, tuple((
-        gameInstance.cameraOffset[0] - (5000 + gameInstance.backgroundOffset[0]),
-        gameInstance.cameraOffset[1] - (
-                5000 + gameInstance.backgroundOffset[1]))))
-    offsetBackground(gameInstance)
+    drawBackground(game_instance, screen)
+    determineBackgroundOffsets(game_instance)
 
-    for body in world.bodies:
-        for fixture in body.fixtures:
-            shape = fixture.shape
-            if isinstance(shape, Box2D.b2CircleShape):
-                pos = b2pyh.flipYaxis(b2pyh.convertB2Vec2toTuple(body.position))
-                screen.blit(gameInstance.crosshairImage, (pos[0] - 8, pos[1] - 8))
-            else:
-                vertices = [(body.transform * v) * gameInstance.PPM for v in shape.vertices]
-                vertices = [(v[0], gameInstance.WINDOW_HEIGHT - v[1]) for v in vertices]
-                b2pyh.offsetBodies(vertices)
-
-                if isinstance(shape, Box2D.b2EdgeShape):
-                    if abs(vertices[0][0] - vertices[1][0]) <= 5:
-                        pygame.draw.line(screen, (66, 12, 55), vertices[0], vertices[1], 3)
-                    else:
-                        pygame.draw.line(screen, (66, 12, 55), vertices[0], vertices[1], 3)
-                elif isinstance(shape, Box2D.b2PolygonShape):
-                    color = (255, 0, 0)
-                    if body.userData is not None:
-                        if 'color' in body.userData:
-                            color = body.userData['color']
-                            pygame.draw.polygon(screen, color, vertices)
-                        if 'player' in body.userData:
-                            screen.blit(gameInstance.playerImage, (vertices[0][0] - 10, vertices[1][1]))
-                        if 'enemy' in body.userData:
-                            screen.blit(gameInstance.enemyImage, (vertices[0][0] - 20, vertices[1][1]))
-                        if 'bullet' in body.userData:
-                            screen.blit(gameInstance.bulletImage, (vertices[0][0] - 5, vertices[1][1]))
-                    else:
-                        pygame.draw.polygon(screen, color, vertices)
+    handleBox2dDrawing(b2pyh, game_instance, screen, world)
     x = 10
-    for i in range(gameInstance.player.lives):
-        screen.blit(gameInstance.heartImage, (x, 0))
+    for _ in range(game_instance.player.lives):
+        screen.blit(game_instance.heart_image, (x, 0))
         x += 50
 
 
-def offsetBackground(gameInstance):
-    if gameInstance.cameraOffset[0] - gameInstance.backgroundOffset[0] > 4000:
-        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0] + 4000, gameInstance.backgroundOffset[1])
-    if gameInstance.cameraOffset[1] - gameInstance.backgroundOffset[1] > 4000:
-        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0], gameInstance.backgroundOffset[1] + 4000)
-    if gameInstance.cameraOffset[0] - gameInstance.backgroundOffset[0] < -4000:
-        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0] - 4000, gameInstance.backgroundOffset[1])
-    if gameInstance.cameraOffset[1] - gameInstance.backgroundOffset[1] < -4000:
-        gameInstance.backgroundOffset = (gameInstance.backgroundOffset[0], gameInstance.backgroundOffset[1] - 4000)
+def handleBox2dDrawing(b2pyh, game_instance, screen, world):
+    for body in world.bodies:
+        for fixture in body.fixtures:
+            shape = fixture.shape
+            handleBody(b2pyh, body, game_instance, screen, shape)
+
+
+def handleBody(b2pyh, body, game_instance, screen, shape):
+    if isinstance(shape, Box2D.b2CircleShape):
+        pos = b2pyh.flip_y_axis(b2pyh.convert_b2_vec2_to_tuple(body.position))
+        screen.blit(game_instance.crosshair_image, (pos[0] - 8, pos[1] - 8))
+    else:
+        vertices = [(body.transform * v) * game_instance.PPM for v in shape.vertices]
+        vertices = [(v[0], game_instance.WINDOW_HEIGHT - v[1]) for v in vertices]
+        b2pyh.offset_bodies(vertices)
+
+        handleDrawingBodyWithVertices(body, game_instance, screen, shape, vertices)
+
+
+def handleDrawingBodyWithVertices(body, game_instance, screen, shape, vertices):
+    if isinstance(shape, Box2D.b2EdgeShape):
+        pygame.draw.line(screen, (66, 12, 55), vertices[0], vertices[1], 3)
+    elif isinstance(shape, Box2D.b2PolygonShape):
+        handlePolygonDrawing(body, game_instance, screen, vertices)
+
+
+def handlePolygonDrawing(body, game_instance, screen, vertices):
+    color = (255, 0, 0)
+    if body.userData is not None:
+        if 'player' in body.userData:
+            screen.blit(game_instance.player_image, (vertices[0][0] - 10, vertices[1][1]))
+        elif 'enemy' in body.userData:
+            if 'color' in body.userData:
+                color = body.userData['color']
+            pygame.draw.polygon(screen, color, vertices)
+            screen.blit(game_instance.enemy_image, (vertices[0][0] - 20, vertices[1][1]))
+        elif 'bullet' in body.userData:
+            screen.blit(game_instance.bullet_image, (vertices[0][0] - 5, vertices[1][1]))
+    else:
+        pygame.draw.polygon(screen, color, vertices)
+
+
+def drawBackground(game_instance, screen):
+    screen.blit(game_instance.background, determineBackgroundPos(game_instance))
+
+
+def determineBackgroundPos(game_instance):
+    x_offset = game_instance.camera_offset[0] - (5000 + game_instance.background_offset[0])
+    y_offset = game_instance.camera_offset[1] - (5000 + game_instance.background_offset[1])
+    return x_offset, y_offset
+
+
+def determineBackgroundOffsets(game_instance):
+    if game_instance.camera_offset[0] - game_instance.background_offset[0] > 4000:
+        game_instance.background_offset = (
+            game_instance.background_offset[0] + 4000, game_instance.background_offset[1])
+    if game_instance.camera_offset[1] - game_instance.background_offset[1] > 4000:
+        game_instance.background_offset = (
+            game_instance.background_offset[0], game_instance.background_offset[1] + 4000)
+    if game_instance.camera_offset[0] - game_instance.background_offset[0] < -4000:
+        game_instance.background_offset = (
+            game_instance.background_offset[0] - 4000, game_instance.background_offset[1])
+    if game_instance.camera_offset[1] - game_instance.background_offset[1] < -4000:
+        game_instance.background_offset = (
+            game_instance.background_offset[0], game_instance.background_offset[1] - 4000)
