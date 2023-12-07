@@ -45,7 +45,8 @@ class Player:
             self.lives -= 1
             self.last_damage_time = pygame.time.get_ticks()
             if self.lives <= 0:
-                game_instance.game_active = False
+                game_instance.main_game_loop = False
+                game_instance.game_over = True
 
     def shoot(self) -> None:
         mouse_pos = self.b2_py_helper.flip_y_axis(pygame.mouse.get_pos())

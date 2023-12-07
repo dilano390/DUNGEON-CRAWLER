@@ -1,6 +1,6 @@
 import Box2D
 import pygame
-
+import sys
 import dungeon
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
@@ -13,6 +13,7 @@ from player import Player
 
 class DungeonGameInstance:
     def __init__(self):
+
         self.PPM = 20
         self.FPS = 60
         self.TIME_STEP = 1.0 / self.FPS
@@ -23,9 +24,14 @@ class DungeonGameInstance:
         self.BULLET_LIFETIME_AFTER_COLL = 500
         self.NON_COLLIDING_CATEGORY = 0
         self.NON_COLLIDING_MASK = 0
+
         self.bullets_up_for_deletion = []
         self.enemies_up_for_deletion = []
         self.game_active = True
+        self.start_screen = True
+        self.game_over = False
+        self.victory = False
+        self.main_game_loop = False
 
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
         self.world = Box2D.b2World([0, 0], doSleep=True)
@@ -38,11 +44,16 @@ class DungeonGameInstance:
         self.player: Player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2_py_helper,
                                      self.b2_helper,
                                      self.camera_offset, self.world, self.INPUT_SENSITIVITY, self.bullets)
-        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, 700, 15, self.world, 200, 70,
+        win_game = lambda: setattr(self, 'victory', True) or setattr(self, 'main_game_loop', False)
+
+        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, 700, 3, self.world, 200, 70,
                                        self.b2_helper,
-                                       self.b2_py_helper, spawnEnemy)
+                                       self.b2_py_helper, spawnEnemy, win_game)
 
         self.crosshair = setUpCrosshair(self.b2_py_helper, self, self.world)
+
+        self.prev_x = self.player.b2_object.position[0]
+        self.prev_y = self.player.b2_object.position[1]
 
         self.heart_image = pygame.image.load("assets/heart.png")  # TODO ADD THE OS PATH JOIN
         self.heart_image = pygame.transform.scale(self.heart_image, (64, 64))
@@ -59,7 +70,41 @@ class DungeonGameInstance:
         self.crosshair_image = pygame.image.load("assets/crosshair.png")
         self.bullet_image = pygame.image.load("assets/bullet.png")
         self.bullet_image = pygame.transform.scale(self.bullet_image, (5, 5))
+        self.start_screen_image = pygame.image.load("assets/startScreen.png")
+        self.start_screen_image = pygame.transform.scale(self.start_screen_image, (800, 800))
+        self.game_over_image = pygame.image.load("assets/gameOverScreen.png")
+        self.game_over_image = pygame.transform.scale(self.game_over_image, (800, 800))
+        self.victory_image = pygame.image.load("assets/victoryScreen.png")
+        self.victory_image = pygame.transform.scale(self.victory_image, (800, 800))
 
+    def reset_game(self):
+        self.bullets_up_for_deletion = []
+        self.enemies_up_for_deletion = []
+        self.game_active = True
+        self.start_screen = True
+        self.game_over = False
+        self.victory = False
+        self.main_game_loop = False
+
+        self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
+        self.world = Box2D.b2World([0, 0], doSleep=True)
+        self.clock = pygame.time.Clock()
+        self.camera_offset = [0, 0]
+        self.b2_py_helper = B2PyHelper(self.PPM, self.camera_offset, self.INPUT_SENSITIVITY, self.WINDOW_HEIGHT)
+        self.b2_helper = B2Helper(self.world, self.PPM)
+        self.bullets = []
+        self.background_offset = (0, 0)
+        self.player: Player = Player(tuple((self.WINDOW_HEIGHT / 2, self.WINDOW_HEIGHT / 2)), self.b2_py_helper,
+                                     self.b2_helper,
+                                     self.camera_offset, self.world, self.INPUT_SENSITIVITY, self.bullets)
+
+        win_game: () = lambda: setattr(self, 'victory', True) or setattr(self, 'main_game_loop', False)
+
+        self.dungeon = dungeon.Dungeon(self.WINDOW_HEIGHT / 2, self.WINDOW_WIDTH / 2, 700, 3, self.world, 200, 70,
+                                       self.b2_helper,
+                                       self.b2_py_helper, spawnEnemy, win_game)
+
+        self.crosshair = setUpCrosshair(self.b2_py_helper, self, self.world)
         self.prev_x = self.player.b2_object.position[0]
         self.prev_y = self.player.b2_object.position[1]
 
@@ -68,7 +113,16 @@ class DungeonGameInstance:
         self.crosshair.position = self.b2_py_helper.convert_tuple_to_b2_vec2(
             self.b2_py_helper.flip_y_axis(pygame.mouse.get_pos()))
         drawGame(self.b2_py_helper, self, self.screen, self.world)
-        pygame.display.flip()
+        self.draw_text_top_right(f" Room {self.dungeon.current_room_num + 1} of {self.dungeon.room_count}")
+
+    def draw_text_top_right(self, text):
+        font = pygame.font.SysFont('timesnewroman', 16)
+        text_surface = font.render(text, True, (0, 0, 0))  # Rendering text
+
+        text_rect = text_surface.get_rect()
+        text_rect.topright = (800, 0)
+
+        self.screen.blit(text_surface, text_rect)  # Drawing text onto the screen
 
     def handle_logic(self):
         current_room = self.dungeon.current_room
@@ -87,10 +141,38 @@ class DungeonGameInstance:
         self.player.determine_velocity()
         handleEvents(self)
 
+    def draw_main_screen(self):
+        self.screen.blit(self.start_screen_image, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game_active = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.start_screen = False
+                self.main_game_loop = True
+
+    def draw_game_over_screen(self):
+        self.screen.blit(self.game_over_image, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game_active = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.game_over = False
+                self.reset_game()
+                self.main_game_loop = True
+
+    def draw_victory_screen(self):
+        self.screen.blit(self.victory_image, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.game_active = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.victory = False
+                self.reset_game()
+                self.main_game_loop = True
+
 # TODO ADD QUESTION MARK BUTTON THAT WILL SHOW KEYS
-# TODO MAIN MENU
-# TODO GAME OVER SCREEN
-# TODO PAUSE BUTTON
 # TODO ADD PROGRESS TRACKER
+
+# TODO PAUSE BUTTON
 # TODO ADD TIMER
 # TODO ADD HIGHSCORES FROM THE TIME

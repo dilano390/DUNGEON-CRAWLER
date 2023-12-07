@@ -11,7 +11,7 @@ from room import Room
 class Dungeon:
     def __init__(self, x: int, y: int, room_wh: int, room_count: int, world: Box2D.b2World,
                  corridor_len: int, corridor_width: int, b2h: B2Helper,
-                 b2pyh: B2PyHelper, enemy_spawner) -> None:
+                 b2pyh: B2PyHelper, enemy_spawner, win_game) -> None:
         self.world = world
         self.rooms = []
         self.x = x
@@ -23,12 +23,17 @@ class Dungeon:
         self.enemy_spawn_func = enemy_spawner
         for _ in range(room_count):
             self.add_room(room_wh, room_wh)
+        self.delete_last_corr()
+
         self.visited = [self.rooms[0]]
         self.current_room = self.rooms[0]
+        self.current_room_num = 0
         self.current_room.close_room()
         self.enemy_spawn_func(self.rooms[0], self.b2pyh, self.b2h, self.world)
         self.room_changed = False
         self.room_count = len(self.rooms)
+        self.last_corr = None
+        self.win_game = win_game
 
     def track_and_change_room(self, player_position):
 
@@ -38,13 +43,14 @@ class Dungeon:
                 if self.current_room != room and room not in self.visited:
                     self.visited.append(room)
                     self.enemy_spawn_func(room, self.b2pyh, self.b2h, self.world)
+                    self.current_room_num += 1
                     room.close_room()
 
                 self.current_room = room
                 if not len(self.current_room.enemies) and self.current_room.closed:
                     self.current_room.open_room()
                     if self.rooms[-1] == room:
-                        print("You win")  # TODO: END THE GAME LOOP -> PROGRESS TO WIN SCREEN
+                        self.win_game()
                 return
 
     def add_corridor(self, side: Side, room_w: int, room_h: int) -> None:
@@ -79,7 +85,11 @@ class Dungeon:
             x += room_w / 2 - self.corridor_width / 2
             x2 += room_w / 2 + self.corridor_width / 2
         edges = [self.b2h.create_edge(w, h, x, y), self.b2h.create_edge(w, h, x2, y2)]
-        self.world.CreateStaticBody(position=self.b2pyh.convert_cords_to_b2_vec2(0, 0), shapes=edges)
+        self.last_corr = self.world.CreateStaticBody(position=self.b2pyh.convert_cords_to_b2_vec2(0, 0), shapes=edges)
+
+    def delete_last_corr(self):
+        if self.last_corr is not None:
+            self.world.DestroyBody(self.last_corr)
 
     def adjust_for_side(self, x: int, y: int, w: int, h: int, side: Side) -> tuple:
         new_x, new_y = x, y
