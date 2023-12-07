@@ -59,7 +59,7 @@ class Player:
         direction = [distance[0] / norm, distance[1] / norm]
         offset = 8
         player_pos = tuple((player_pos[0] + direction[0] * offset, player_pos[1] + direction[1] * offset))
-        speed = 600
+        speed = 500
         bullet_vector = [direction[0] * math.sqrt(2) * speed, direction[1] * math.sqrt(2) * speed]
         self.bullets.append(
             Bullet(self.b2_py_helper.convert_tuple_to_b2_vec2(player_pos),

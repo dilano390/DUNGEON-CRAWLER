@@ -1,6 +1,6 @@
 import Box2D
 import pygame
-import sys
+
 import dungeon
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
@@ -57,16 +57,18 @@ class DungeonGameInstance:
 
         self.heart_image = pygame.image.load("assets/heart.png")  # TODO ADD THE OS PATH JOIN
         self.heart_image = pygame.transform.scale(self.heart_image, (64, 64))
-        self.wall_image_v = pygame.image.load("assets/wallV.png")  # TODO ADD THE OS PATH JOIN
+        self.wall_image_v = pygame.image.load("assets/wallV.png")
         self.wall_image_v = pygame.transform.scale(self.wall_image_v, (20, 700))
-        self.wall_image_h = pygame.image.load("assets/wallH.png")  # TODO ADD THE OS PATH JOIN
+        self.wall_image_h = pygame.image.load("assets/wallH.png")
         self.wall_image_h = pygame.transform.scale(self.wall_image_h, (700, 20))
-        self.background = pygame.image.load("assets/background.png")  # TODO ADD THE OS PATH JOIN
+        self.background = pygame.image.load("assets/background.png")
         self.background = pygame.transform.scale(self.background, (10000, 10000))
-        self.player_image = pygame.image.load("assets/player.png")  # TODO ADD THE OS PATH JOIN
+        self.player_image = pygame.image.load("assets/player.png")
         self.player_image = pygame.transform.scale(self.player_image, (10, 10))
-        self.enemy_image = pygame.image.load("assets/enemy.png")  # TODO ADD THE OS PATH JOIN
+        self.enemy_image = pygame.image.load("assets/enemy.png")
         self.enemy_image = pygame.transform.scale(self.enemy_image, (23, 23))
+        self.big_enemy_image = pygame.image.load("assets/bigEnemy.png")
+        self.big_enemy_image = pygame.transform.scale(self.big_enemy_image,(35,35))
         self.crosshair_image = pygame.image.load("assets/crosshair.png")
         self.bullet_image = pygame.image.load("assets/bullet.png")
         self.bullet_image = pygame.transform.scale(self.bullet_image, (5, 5))

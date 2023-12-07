@@ -20,4 +20,5 @@ class Bullet:  # TODO BULLETS UP FOR DELETION SHOULD STILL BE ABLE TO DAMAGE ENE
         self.body.density = density
         self.creation_time = time.get_ticks()
         self.impact_time = 0
-        self.body.mass = 30
+        self.body.restitution = 1
+        self.body.mass = 20

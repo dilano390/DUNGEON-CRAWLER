@@ -42,8 +42,11 @@ class Dungeon:
                               room.h - 20):
                 if self.current_room != room and room not in self.visited:
                     self.visited.append(room)
-                    self.enemy_spawn_func(room, self.b2pyh, self.b2h, self.world)
                     self.current_room_num += 1
+                    boss = False
+                    if self.current_room_num % 4 == 0 or self.current_room_num == self.room_count -1:
+                        boss = True
+                    self.enemy_spawn_func(room, self.b2pyh, self.b2h, self.world, boss)
                     room.close_room()
 
                 self.current_room = room

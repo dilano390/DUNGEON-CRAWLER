@@ -8,7 +8,7 @@ from b2PyHelper import B2PyHelper
 
 class Enemy:  # TODO ADD BOSSES
     def __init__(self, cage_pos: tuple, cage_dim: tuple, lives: int, speed: int, b2_py_helper: B2PyHelper,
-                 b2_helper: B2Helper, world: Box2D.b2World):
+                 b2_helper: B2Helper, world: Box2D.b2World, w = 20, h = 20, big : bool = False):
         self.lives = lives
         self.speed = speed
         self.cage_pos = cage_pos
@@ -17,8 +17,8 @@ class Enemy:  # TODO ADD BOSSES
         self.b2_helper = b2_helper
         self.world = world
         self.direction = (0, 0)
-        self.w = 20
-        self.h = 20
+        self.w = w
+        self.h = h
         self.x = self.constrain(self.get_random_number(0, cage_dim[0]), 0 + self.w + 5, self.cage_dim[0] - self.w - 5) + \
                  cage_pos[0]
         self.y = self.constrain(self.get_random_number(0, cage_dim[1]), 0 + self.h + 5, self.cage_dim[1] - self.h - 5) + \
@@ -30,7 +30,7 @@ class Enemy:  # TODO ADD BOSSES
         self.b2_object.mass = self.get_random_number(10, 40)
         self.b2_object.linearDamping = 5
         self.b2_object.fixtures[0].friction = 3
-        self.b2_object.userData = {'enemy': self, 'color': tuple((255, 100, 0))}
+        self.b2_object.userData = {'enemy': self,'big' : big,'color': tuple((255, 100, 0))}
 
     def take_damage(self, damage):
         color = self.b2_object.userData['color']

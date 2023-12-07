@@ -51,6 +51,7 @@ def handleBullet(bullet, game_instance):
                     enemy.take_damage(2)
                 elif 'player' in contact_user_data:  # DO NOT REMOVE. IF YOU REMOVE YOU CAUSE GHOST BULLETS
                     return True
+
         game_instance.bullets_up_for_deletion.append(bullet)
         bullet.impact_time = pygame.time.get_ticks()
         game_instance.bullets.remove(bullet)
@@ -126,7 +127,12 @@ def handlePolygonDrawing(body, game_instance, screen, vertices):
             if 'color' in body.userData:
                 color = body.userData['color']
             pygame.draw.polygon(screen, color, vertices)
-            screen.blit(game_instance.enemy_image, (vertices[0][0] - 20, vertices[1][1]))
+            if 'big' in body.userData and  body.userData['big']:
+                screen.blit(game_instance.big_enemy_image, (vertices[0][0] - 32, vertices[1][1]))
+            else:
+                screen.blit(game_instance.enemy_image, (vertices[0][0] - 20, vertices[1][1]))
+
+
         elif 'bullet' in body.userData:
             screen.blit(game_instance.bullet_image, (vertices[0][0] - 5, vertices[1][1]))
     else:

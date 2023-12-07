@@ -11,9 +11,6 @@ def main() -> None:
 
     game_instance = DungeonGameInstance()
 
-
-
-
     while game_instance.game_active:
         if game_instance.start_screen:
             game_instance.draw_main_screen()
@@ -27,6 +24,7 @@ def main() -> None:
         elif game_instance.victory:
             game_instance.draw_victory_screen()
         pygame.display.flip()
+
 
 if __name__ == '__main__':
     main()
