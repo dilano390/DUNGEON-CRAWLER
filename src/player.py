@@ -7,6 +7,7 @@ import pygame
 from b2Helper import B2Helper
 from b2PyHelper import B2PyHelper
 from bullet import Bullet
+from src.weapon import Weapon
 
 
 class Player:
@@ -26,7 +27,15 @@ class Player:
         self.lives = 5
         self.last_damage_time = 0
         self.last_shot_time = 0
-        self.time_between_shots = 300
+
+        pistol = Weapon(300,2,500,50)
+        sniper = Weapon(1000,10,1000,200)
+
+
+        self.weapons = [pistol,sniper]
+        self.current_weapon_index = 0
+        self.current_weapon = self.weapons[self.current_weapon_index]
+
 
     def determine_velocity(self) -> None:
         vel_y = 0
@@ -42,6 +51,12 @@ class Player:
             vel_x -= self.sensitivity
         self.b2_object.linearVelocity = Box2D.b2Vec2(vel_x, vel_y)
 
+    def switch_weapon(self):
+        self.current_weapon_index += 1
+        if self.current_weapon_index == len(self.weapons):
+            self.current_weapon_index = 0
+        self.current_weapon = self.weapons[self.current_weapon_index]
+
     def player_take_damage(self, game_instance):
         if pygame.time.get_ticks() - self.last_damage_time > 1000:
             self.lives -= 1
@@ -51,7 +66,8 @@ class Player:
                 game_instance.game_over = True
 
     def shoot(self) -> None:
-        if pygame.time.get_ticks() - self.last_shot_time > self.time_between_shots:
+        weapon = self.current_weapon
+        if pygame.time.get_ticks() - self.last_shot_time > weapon.shot_delay:
             self.last_shot_time = pygame.time.get_ticks()
             mouse_pos = self.b2_py_helper.flip_y_axis(pygame.mouse.get_pos())
             player_pos = self.b2_py_helper.convert_b2_vec2_to_tuple(self.b2_object.position)
@@ -63,9 +79,9 @@ class Player:
             direction = [distance[0] / norm, distance[1] / norm]
             offset = 8
             player_pos = tuple((player_pos[0] + direction[0] * offset, player_pos[1] + direction[1] * offset))
-            speed = 500
+            speed = weapon.bullet_speed
             bullet_vector = [direction[0] * math.sqrt(2) * speed, direction[1] * math.sqrt(2) * speed]
             self.bullets.append(
                 Bullet(self.b2_py_helper.convert_tuple_to_b2_vec2(player_pos),
                        self.b2_py_helper.convert_tuple_to_b2_vec2(bullet_vector),
-                       50, self.world, self.b2_py_helper, self.b2_helper))
+                       weapon.bullet_density, self.world, self.b2_py_helper, self.b2_helper))

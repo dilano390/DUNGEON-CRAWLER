@@ -21,6 +21,8 @@ def handleEvents(game_instance) -> None:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_instance.game_active = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:
+            game_instance.player.switch_weapon()
 
 def handleMouseInput(game_instance) -> None:
     mouse_keys = pygame.mouse.get_pressed(num_buttons=3)
@@ -50,7 +52,8 @@ def handleBullet(bullet, game_instance):
             if contact_user_data is not None:
                 if 'enemy' in contact_user_data:
                     enemy: Enemy = contact_user_data['enemy']
-                    enemy.take_damage(2)
+                    damage = game_instance.player.current_weapon.damage
+                    enemy.take_damage(damage)
                 elif 'player' in contact_user_data:  # DO NOT REMOVE. IF YOU REMOVE YOU CAUSE GHOST BULLETS
                     return True
 
