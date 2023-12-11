@@ -21,9 +21,11 @@ def handleEvents(game_instance) -> None:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_instance.game_active = False
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            game_instance.player.shoot()
 
+def handleMouseInput(game_instance) -> None:
+    mouse_keys = pygame.mouse.get_pressed(num_buttons=3)
+    if mouse_keys[0]:
+        game_instance.player.shoot()
 
 def determineCameraOffset(game_instance, player: Player, prev_x: float, prev_y: float) -> Tuple[
     float, float]:

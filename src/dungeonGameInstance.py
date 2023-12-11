@@ -7,7 +7,7 @@ from b2PyHelper import B2PyHelper
 from dungeonHelper import updateAllEnemiesInList
 from enemySpawner import spawnEnemy
 from gameFlow import (setUpCrosshair, handleEvents, determineCameraOffset, bulletDecay, drawGame, checkBullets,
-                      killEnemies, checkPlayerHits)
+                      killEnemies, checkPlayerHits, handleMouseInput)
 from player import Player
 
 
@@ -142,6 +142,7 @@ class DungeonGameInstance:
     def handle_input(self):
         self.player.determine_velocity()
         handleEvents(self)
+        handleMouseInput(self)
 
     def draw_main_screen(self):
         self.screen.blit(self.start_screen_image, (0, 0))
@@ -173,8 +174,5 @@ class DungeonGameInstance:
                 self.main_game_loop = True
 
 # TODO ADD QUESTION MARK BUTTON THAT WILL SHOW KEYS
-# TODO ADD PROGRESS TRACKER
 
 # TODO PAUSE BUTTON
-# TODO ADD TIMER
-# TODO ADD HIGHSCORES FROM THE TIME

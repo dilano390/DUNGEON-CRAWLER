@@ -25,6 +25,8 @@ class Player:
         self.bullets = bullets
         self.lives = 5
         self.last_damage_time = 0
+        self.last_shot_time = 0
+        self.time_between_shots = 300
 
     def determine_velocity(self) -> None:
         vel_y = 0
@@ -49,19 +51,21 @@ class Player:
                 game_instance.game_over = True
 
     def shoot(self) -> None:
-        mouse_pos = self.b2_py_helper.flip_y_axis(pygame.mouse.get_pos())
-        player_pos = self.b2_py_helper.convert_b2_vec2_to_tuple(self.b2_object.position)
+        if pygame.time.get_ticks() - self.last_shot_time > self.time_between_shots:
+            self.last_shot_time = pygame.time.get_ticks()
+            mouse_pos = self.b2_py_helper.flip_y_axis(pygame.mouse.get_pos())
+            player_pos = self.b2_py_helper.convert_b2_vec2_to_tuple(self.b2_object.position)
 
-        mouse_pos = tuple((mouse_pos[0] - self.camera_offset[0], mouse_pos[1] + self.camera_offset[1]))
-        distance = [mouse_pos[0] - player_pos[0], mouse_pos[1] - player_pos[1]]
-        norm = math.sqrt(distance[0] ** 2 + distance[1] ** 2)
-        if norm == 0: norm += 0.2
-        direction = [distance[0] / norm, distance[1] / norm]
-        offset = 8
-        player_pos = tuple((player_pos[0] + direction[0] * offset, player_pos[1] + direction[1] * offset))
-        speed = 500
-        bullet_vector = [direction[0] * math.sqrt(2) * speed, direction[1] * math.sqrt(2) * speed]
-        self.bullets.append(
-            Bullet(self.b2_py_helper.convert_tuple_to_b2_vec2(player_pos),
-                   self.b2_py_helper.convert_tuple_to_b2_vec2(bullet_vector),
-                   50, self.world, self.b2_py_helper, self.b2_helper))
+            mouse_pos = tuple((mouse_pos[0] - self.camera_offset[0], mouse_pos[1] + self.camera_offset[1]))
+            distance = [mouse_pos[0] - player_pos[0], mouse_pos[1] - player_pos[1]]
+            norm = math.sqrt(distance[0] ** 2 + distance[1] ** 2)
+            if norm == 0: norm += 0.2
+            direction = [distance[0] / norm, distance[1] / norm]
+            offset = 8
+            player_pos = tuple((player_pos[0] + direction[0] * offset, player_pos[1] + direction[1] * offset))
+            speed = 500
+            bullet_vector = [direction[0] * math.sqrt(2) * speed, direction[1] * math.sqrt(2) * speed]
+            self.bullets.append(
+                Bullet(self.b2_py_helper.convert_tuple_to_b2_vec2(player_pos),
+                       self.b2_py_helper.convert_tuple_to_b2_vec2(bullet_vector),
+                       50, self.world, self.b2_py_helper, self.b2_helper))
