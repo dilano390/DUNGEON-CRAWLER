@@ -95,6 +95,8 @@ def drawGame(b2pyh: B2PyHelper, game_instance, screen: pygame.surface,
     for _ in range(game_instance.player.lives):
         screen.blit(game_instance.heart_image, (x, 0))
         x += 50
+    weapon_image = game_instance.weapon_images[game_instance.player.current_weapon_index]
+    screen.blit(weapon_image, (32, 700))
 
 
 def handleBox2dDrawing(b2pyh, game_instance, screen, world):

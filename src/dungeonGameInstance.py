@@ -78,7 +78,11 @@ class DungeonGameInstance:
         self.game_over_image = pygame.transform.scale(self.game_over_image, (800, 800))
         self.victory_image = pygame.image.load("assets/victoryScreen.png")
         self.victory_image = pygame.transform.scale(self.victory_image, (800, 800))
-
+        self.sniper_image = pygame.image.load("assets/sniper.png")
+        self.sniper_image = pygame.transform.scale(self.sniper_image,(64,64))
+        self.pistol_image = pygame.image.load("assets/pistol.png")
+        self.pistol_image = pygame.transform.scale(self.pistol_image,(64,64))
+        self.weapon_images = [self.pistol_image,self.sniper_image]
     def reset_game(self):
         self.bullets_up_for_deletion = []
         self.enemies_up_for_deletion = []
